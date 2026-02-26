@@ -1,0 +1,2901 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard B2B - Suministros Ardila S.A.S.</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-primary: #f4f5f5;
+            --bg-panel: #ffffff;
+            --bg-panel-header: #f7f8fa;
+            --border-color: #e0e0e0;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --accent-blue: #3b82f6;
+            --accent-green: #22c55e;
+            --accent-yellow: #eab308;
+            --accent-red: #ef4444;
+            --accent-purple: #8b5cf6;
+            --accent-orange: #f97316;
+            --accent-cyan: #06b6d4;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+            --radius: 4px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        /* ========================================
+           HEADER PRINCIPAL CON TABS
+           ======================================== */
+        .main-header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo-section h1 {
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+        }
+        .logo-section .company {
+            font-size: 13px;
+            color: rgba(255,255,255,0.7);
+            padding-left: 12px;
+            border-left: 1px solid rgba(255,255,255,0.3);
+        }
+        .header-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            color: rgba(255,255,255,0.8);
+            font-size: 12px;
+        }
+        .header-info .user {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .header-info .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        /* PESTAÑAS */
+        .tabs-container {
+            display: flex;
+            padding: 0 24px;
+            gap: 4px;
+        }
+        .tab-btn {
+            padding: 14px 28px;
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.7);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tab-btn:hover {
+            color: white;
+            background: rgba(255,255,255,0.1);
+        }
+        .tab-btn.active {
+            color: white;
+            background: var(--bg-primary);
+            border-radius: 8px 8px 0 0;
+        }
+        .tab-btn .tab-icon {
+            font-size: 18px;
+        }
+        .tab-btn .tab-badge {
+            background: var(--accent-red);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        /* ========================================
+           CONTENIDO DE PESTAÑAS
+           ======================================== */
+        .tab-content {
+            display: none;
+            padding: 16px;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* ========================================
+           ESTILOS COMPARTIDOS
+           ======================================== */
+        .filters-section {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+        .filters-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .filters-header h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .filters-header-actions { display: flex; gap: 12px; align-items: center; }
+        .active-filters-count {
+            font-size: 12px;
+            background: var(--accent-blue);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+        .clear-filters-btn {
+            font-size: 12px;
+            color: var(--accent-blue);
+            background: none;
+            border: 1px solid var(--accent-blue);
+            padding: 4px 12px;
+            border-radius: var(--radius);
+            cursor: pointer;
+        }
+        .clear-filters-btn:hover { background: var(--accent-blue); color: white; }
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+        }
+        .filter-group { display: flex; flex-direction: column; gap: 4px; }
+        .filter-group label {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+        .filter-group select, .filter-group input {
+            padding: 8px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            font-size: 13px;
+            background: var(--bg-panel);
+            cursor: pointer;
+        }
+        .filter-group select:focus, .filter-group input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+        .filter-group select.active-filter, .filter-group input.active-filter {
+            border-color: var(--accent-blue);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        /* Fecha de corte especial para Cartera */
+        .fecha-corte-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            padding: 10px 16px;
+            border-radius: var(--radius);
+            border: 1px solid #fbbf24;
+            margin-bottom: 16px;
+        }
+        .fecha-corte-container label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #92400e;
+            text-transform: uppercase;
+        }
+        .fecha-corte-container input {
+            padding: 6px 10px;
+            border: 1px solid #fbbf24;
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-weight: 600;
+            background: white;
+            color: #92400e;
+        }
+        .fecha-corte-info {
+            font-size: 11px;
+            color: #b45309;
+        }
+
+        /* Métricas */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .metric-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+        }
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+        }
+        .metric-card.blue::before { background: var(--accent-blue); }
+        .metric-card.green::before { background: var(--accent-green); }
+        .metric-card.yellow::before { background: var(--accent-yellow); }
+        .metric-card.red::before { background: var(--accent-red); }
+        .metric-card.purple::before { background: var(--accent-purple); }
+        .metric-card.orange::before { background: var(--accent-orange); }
+        .metric-card.cyan::before { background: var(--accent-cyan); }
+        .metric-label {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+        .metric-value {
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+        .metric-value.blue { color: var(--accent-blue); }
+        .metric-value.green { color: var(--accent-green); }
+        .metric-value.yellow { color: var(--accent-yellow); }
+        .metric-value.red { color: var(--accent-red); }
+        .metric-value.purple { color: var(--accent-purple); }
+        .metric-value.orange { color: var(--accent-orange); }
+        .metric-change {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 6px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .metric-change.positive { color: var(--accent-green); }
+        .metric-change.negative { color: var(--accent-red); }
+        .metric-change.neutral { color: var(--text-muted); }
+        .metric-subvalue {
+            margin-top: 6px;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+        .metric-subvalue span { font-weight: 600; }
+        .semaforo-indicator {
+            position: absolute;
+            top: 14px; right: 14px;
+            width: 14px; height: 14px;
+            border-radius: 50%;
+        }
+        .semaforo-indicator.rojo { background: var(--accent-red); box-shadow: 0 0 8px rgba(239,68,68,0.5); }
+        .semaforo-indicator.amarillo { background: var(--accent-yellow); box-shadow: 0 0 8px rgba(234,179,8,0.5); }
+        .semaforo-indicator.verde { background: var(--accent-green); box-shadow: 0 0 8px rgba(34,197,94,0.5); }
+
+        /* Paneles */
+        .panels-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+        .panel.full-width { grid-column: 1 / -1; }
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: var(--bg-panel-header);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .panel-title { font-size: 13px; font-weight: 600; }
+        .panel-actions { display: flex; gap: 6px; }
+        .panel-action-btn {
+            padding: 4px 10px;
+            font-size: 11px;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+        .panel-action-btn:hover, .panel-action-btn.active {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: white;
+        }
+        .panel-body {
+            padding: 16px;
+            min-height: 260px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .chart-container { width: 100%; height: 240px; position: relative; }
+
+        /* Tablas */
+        .table-container { width: 100%; overflow-x: auto; }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .data-table th {
+            background: var(--bg-panel-header);
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 2px solid var(--border-color);
+            font-size: 10px;
+            text-transform: uppercase;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .data-table th:hover { background: #eef2f7; }
+        .data-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .data-table tr:hover td { background: var(--bg-panel-header); }
+        .data-table .number { text-align: right; font-family: monospace; }
+        .data-table .positive { color: var(--accent-green); }
+        .data-table .negative { color: var(--accent-red); }
+        .data-table .warning { color: var(--accent-orange); }
+        .status-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        .status-badge.sano, .status-badge.al-dia { background: rgba(34,197,94,0.15); color: var(--accent-green); }
+        .status-badge.riesgo { background: rgba(234,179,8,0.15); color: #b45309; }
+        .status-badge.crítico, .status-badge.vencido { background: rgba(239,68,68,0.15); color: var(--accent-red); }
+        .data-table tr.row-vencido td { background: rgba(239,68,68,0.03); }
+        .mora-bar {
+            width: 50px;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+        .mora-bar-fill { height: 100%; border-radius: 3px; }
+        .mora-bar-fill.low { background: var(--accent-green); }
+        .mora-bar-fill.medium { background: var(--accent-yellow); }
+        .mora-bar-fill.high { background: var(--accent-orange); }
+        .mora-bar-fill.critical { background: var(--accent-red); }
+
+        /* Donut chart */
+        .donut-chart-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            width: 100%;
+        }
+        .donut-chart-container { width: 180px; height: 180px; position: relative; }
+        .donut-legend { display: flex; flex-direction: column; gap: 10px; }
+        .legend-item { display: flex; align-items: center; gap: 8px; }
+        .legend-color { width: 14px; height: 14px; border-radius: 3px; }
+        .legend-text { display: flex; flex-direction: column; }
+        .legend-label { font-size: 12px; font-weight: 500; }
+        .legend-value { font-size: 10px; color: var(--text-secondary); }
+
+        /* Bloque de Progreso Comisiones */
+        .progress-block {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 1px solid #7dd3fc;
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        .progress-block-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .progress-block-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0369a1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .estado-comision {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+        .estado-comision.aplica-14 {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+        }
+        .estado-comision.aplica-12 {
+            background: linear-gradient(135deg, #eab308 0%, #ca8a04 100%);
+            color: white;
+        }
+        .estado-comision.no-aplica {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+        .progress-bars {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .progress-item {
+            background: white;
+            border-radius: var(--radius);
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+        }
+        .progress-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .progress-item-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+        .progress-item-value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .progress-item-value.green { color: var(--accent-green); }
+        .progress-item-value.yellow { color: #ca8a04; }
+        .progress-item-value.red { color: var(--accent-red); }
+        .progress-bar-container {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        .progress-bar-fill.green { background: linear-gradient(90deg, #22c55e, #16a34a); }
+        .progress-bar-fill.yellow { background: linear-gradient(90deg, #eab308, #ca8a04); }
+        .progress-bar-fill.red { background: linear-gradient(90deg, #ef4444, #dc2626); }
+        .progress-message {
+            background: white;
+            border-radius: var(--radius);
+            padding: 12px 16px;
+            border-left: 4px solid var(--accent-blue);
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+        .progress-message strong {
+            color: var(--accent-blue);
+        }
+        .comision-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        .comision-badge.si { background: rgba(34,197,94,0.15); color: var(--accent-green); }
+        .comision-badge.no { background: rgba(239,68,68,0.15); color: var(--accent-red); }
+
+        /* Badge de alerta amarillo */
+        .tab-badge-warning {
+            background: var(--accent-orange) !important;
+        }
+
+        /* Alertas de Compras */
+        .alerts-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .alert-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+        .alert-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: var(--bg-panel-header);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .alert-card-title {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .alert-card-title.critical { color: var(--accent-red); }
+        .alert-card-title.warning { color: var(--accent-orange); }
+        .alert-card-title.info { color: var(--accent-blue); }
+        .alert-card-count {
+            font-size: 12px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+        .alert-card-count.critical { background: rgba(239,68,68,0.15); color: var(--accent-red); }
+        .alert-card-count.warning { background: rgba(249,115,22,0.15); color: var(--accent-orange); }
+        .alert-card-count.info { background: rgba(59,130,246,0.15); color: var(--accent-blue); }
+        .alert-card-body {
+            padding: 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .alert-item {
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .alert-item:last-child { border-bottom: none; }
+        .alert-item:hover { background: var(--bg-panel-header); }
+        .alert-item-text { flex: 1; }
+        .alert-item-value {
+            font-weight: 600;
+            margin-left: 12px;
+        }
+        .alert-item-value.critical { color: var(--accent-red); }
+        .alert-item-value.warning { color: var(--accent-orange); }
+
+        /* Stock indicator */
+        .stock-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .stock-bar {
+            width: 60px;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .stock-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+        .stock-bar-fill.critical { background: var(--accent-red); }
+        .stock-bar-fill.warning { background: var(--accent-orange); }
+        .stock-bar-fill.ok { background: var(--accent-green); }
+
+        /* OC Status badges */
+        .oc-status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        .oc-status.enviada { background: rgba(59,130,246,0.15); color: var(--accent-blue); }
+        .oc-status.pendiente { background: rgba(249,115,22,0.15); color: var(--accent-orange); }
+        .oc-status.parcial { background: rgba(234,179,8,0.15); color: #b45309; }
+        .oc-status.completa { background: rgba(34,197,94,0.15); color: var(--accent-green); }
+        .oc-status.cancelada { background: rgba(107,114,128,0.15); color: var(--text-secondary); }
+        .oc-status.vencida { background: rgba(239,68,68,0.15); color: var(--accent-red); }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .panels-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .header-top { flex-direction: column; gap: 12px; }
+            .tabs-container { overflow-x: auto; padding: 0 12px; }
+            .tab-btn { padding: 12px 16px; font-size: 13px; }
+            .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+            .metric-value { font-size: 22px; }
+            .filters-grid { grid-template-columns: repeat(2, 1fr); }
+            .donut-chart-wrapper { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <!-- ========================================
+         HEADER PRINCIPAL CON TABS
+         ======================================== -->
+    <header class="main-header">
+        <div class="header-top">
+            <div class="logo-section">
+                <h1>📊 Dashboard B2B</h1>
+                <span class="company">Suministros Ardila S.A.S.</span>
+            </div>
+            <div class="header-info">
+                <span id="currentDateTime"></span>
+                <div class="user">
+                    <span class="user-avatar">👤</span>
+                    <span>Administrador</span>
+                </div>
+            </div>
+        </div>
+        <div class="tabs-container">
+            <button class="tab-btn active" onclick="switchTab('comercial')">
+                <span class="tab-icon">💼</span>
+                <span>Área Comercial</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('cartera')">
+                <span class="tab-icon">💰</span>
+                <span>Área de Cartera</span>
+                <span class="tab-badge" id="carteraVencidaBadge">0</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('recaudo')">
+                <span class="tab-icon">🧾</span>
+                <span>Comisiones / Recaudo</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('compras')">
+                <span class="tab-icon">📦</span>
+                <span>Compras</span>
+                <span class="tab-badge tab-badge-warning" id="comprasAlertBadge">0</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- ========================================
+         TAB: ÁREA COMERCIAL
+         ======================================== -->
+    <div id="tab-comercial" class="tab-content active">
+        <section class="filters-section">
+            <div class="filters-header">
+                <h3>🔍 Filtros</h3>
+                <div class="filters-header-actions">
+                    <span class="active-filters-count" id="comercialActiveFilters">0 activos</span>
+                    <button class="clear-filters-btn" onclick="clearComercialFilters()">Limpiar todos</button>
+                </div>
+            </div>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label>Fecha Inicio</label>
+                    <input type="date" id="comFechaInicio" value="2025-01-01" onchange="applyComercialFilters()">
+                </div>
+                <div class="filter-group">
+                    <label>Fecha Fin</label>
+                    <input type="date" id="comFechaFin" value="2025-01-31" onchange="applyComercialFilters()">
+                </div>
+                <div class="filter-group">
+                    <label>Vendedor</label>
+                    <select id="comVendedor" onchange="applyComercialFilters()"><option value="">Todos</option></select>
+                </div>
+                <div class="filter-group">
+                    <label>Municipio</label>
+                    <select id="comMunicipio" onchange="applyComercialFilters()"><option value="">Todos</option></select>
+                </div>
+                <div class="filter-group">
+                    <label>Tipo de Cliente</label>
+                    <select id="comTipoCliente" onchange="applyComercialFilters()">
+                        <option value="">Todos</option>
+                        <option value="Ferretero">Ferretero</option>
+                        <option value="Aluminero">Aluminero</option>
+                        <option value="Mayorista">Mayorista</option>
+                        <option value="Industria">Industria</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Línea de Productos</label>
+                    <select id="comLinea" onchange="applyComercialFilters()"><option value="">Todas</option></select>
+                </div>
+                <div class="filter-group">
+                    <label>Producto</label>
+                    <select id="comProducto" onchange="applyComercialFilters()"><option value="">Todos</option></select>
+                </div>
+                <div class="filter-group">
+                    <label>Cliente</label>
+                    <select id="comCliente" onchange="applyComercialFilters()"><option value="">Todos</option></select>
+                </div>
+            </div>
+        </section>
+
+        <section class="metrics-grid">
+            <div class="metric-card blue">
+                <div class="metric-label">Ventas del Mes</div>
+                <div class="metric-value blue" id="comMetricVentas">$0</div>
+                <div class="metric-change positive" id="comMetricVentasChange"><span>-</span></div>
+            </div>
+            <div class="metric-card purple">
+                <div class="metric-label">Meta del Mes</div>
+                <div class="metric-value">$520.0M</div>
+                <div class="metric-change neutral"><span>Meta comercial Ene 2025</span></div>
+            </div>
+            <div class="metric-card yellow">
+                <div class="semaforo-indicator" id="comSemaforo"></div>
+                <div class="metric-label">Cumplimiento</div>
+                <div class="metric-value" id="comMetricCumplimiento">0%</div>
+                <div class="metric-change neutral" id="comMetricCumplimientoStatus"><span>-</span></div>
+            </div>
+            <div class="metric-card cyan">
+                <div class="metric-label">Ticket Promedio</div>
+                <div class="metric-value" id="comMetricTicket">$0</div>
+                <div class="metric-change positive"><span>↑ 5.2% vs anterior</span></div>
+            </div>
+            <div class="metric-card green">
+                <div class="metric-label">Clientes Activos</div>
+                <div class="metric-value green" id="comMetricClientes">0</div>
+                <div class="metric-change neutral" id="comMetricClientesChange"><span>-</span></div>
+            </div>
+            <div class="metric-card orange">
+                <div class="metric-label">Margen Bruto ($)</div>
+                <div class="metric-value orange" id="comMetricMargen">$0</div>
+                <div class="metric-change positive"><span>↑ 8.7% vs anterior</span></div>
+            </div>
+            <div class="metric-card green">
+                <div class="metric-label">Margen Bruto (%)</div>
+                <div class="metric-value green" id="comMetricMargenPct">0%</div>
+                <div class="metric-change negative"><span>↓ -0.8pp vs anterior</span></div>
+            </div>
+            <div class="metric-card blue">
+                <div class="metric-label">Nº Pedidos</div>
+                <div class="metric-value" id="comMetricPedidos">0</div>
+                <div class="metric-change neutral" id="comMetricPedidosChange"><span>-</span></div>
+            </div>
+        </section>
+
+        <div class="panels-grid">
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title">A) Ventas por Tipo de Cliente</span>
+                    <div class="panel-actions">
+                        <button class="panel-action-btn active" onclick="setComChartMode('tipoCliente','ventas',this)">Ventas</button>
+                        <button class="panel-action-btn" onclick="setComChartMode('tipoCliente','margen',this)">Margen $</button>
+                        <button class="panel-action-btn" onclick="setComChartMode('tipoCliente','margenPct',this)">Margen %</button>
+                    </div>
+                </div>
+                <div class="panel-body"><div class="chart-container"><canvas id="comChartTipoCliente"></canvas></div></div>
+            </div>
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title">B) Ventas por Municipio</span>
+                    <div class="panel-actions">
+                        <button class="panel-action-btn active" onclick="setComChartMode('municipio','ventas',this)">Ventas</button>
+                        <button class="panel-action-btn" onclick="setComChartMode('municipio','margen',this)">Margen</button>
+                        <button class="panel-action-btn" onclick="setComChartMode('municipio','clientes',this)">Clientes</button>
+                    </div>
+                </div>
+                <div class="panel-body"><div class="chart-container"><canvas id="comChartMunicipio"></canvas></div></div>
+            </div>
+        </div>
+
+        <div class="panels-grid">
+            <div class="panel">
+                <div class="panel-header"><span class="panel-title">C) Ventas por Línea de Producto</span></div>
+                <div class="panel-body"><div class="chart-container"><canvas id="comChartLineas"></canvas></div></div>
+            </div>
+            <div class="panel">
+                <div class="panel-header"><span class="panel-title">E) Rentabilidad (Margen % por Línea)</span></div>
+                <div class="panel-body"><div class="chart-container"><canvas id="comChartRentabilidad"></canvas></div></div>
+            </div>
+        </div>
+
+        <div class="panels-grid">
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title">F) Ranking de Vendedores</span>
+                    <div class="panel-actions">
+                        <button class="panel-action-btn active" onclick="setComChartMode('vendedores','ventas',this)">Ventas</button>
+                        <button class="panel-action-btn" onclick="setComChartMode('vendedores','margen',this)">Margen $</button>
+                        <button class="panel-action-btn" onclick="setComChartMode('vendedores','pedidos',this)">Pedidos</button>
+                    </div>
+                </div>
+                <div class="panel-body"><div class="chart-container"><canvas id="comChartVendedores"></canvas></div></div>
+            </div>
+            <div class="panel">
+                <div class="panel-header"><span class="panel-title">F) Tendencia - Últimos 6 Meses</span></div>
+                <div class="panel-body"><div class="chart-container"><canvas id="comChartTendencia"></canvas></div></div>
+            </div>
+        </div>
+
+        <div class="panels-grid">
+            <div class="panel full-width">
+                <div class="panel-header">
+                    <span class="panel-title">D) Ventas por Producto - Top 15</span>
+                    <div class="panel-actions"><button class="panel-action-btn" onclick="exportCSV('comProductos')">📥 Exportar</button></div>
+                </div>
+                <div class="panel-body" style="padding:0;align-items:flex-start;">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr><th>#</th><th>Producto</th><th>Línea</th><th class="number">Ventas</th><th class="number">Margen $</th><th class="number">Margen %</th><th class="number">Volumen</th></tr>
+                            </thead>
+                            <tbody id="comTbodyProductos"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panels-grid">
+            <div class="panel full-width">
+                <div class="panel-header">
+                    <span class="panel-title">G) Top 30 Clientes - Compran vs Pagan</span>
+                    <div class="panel-actions"><button class="panel-action-btn" onclick="exportCSV('comClientes')">📥 Exportar</button></div>
+                </div>
+                <div class="panel-body" style="padding:0;align-items:flex-start;">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr><th>Cliente</th><th>Tipo</th><th>Municipio</th><th class="number">Ventas</th><th class="number">Pedidos</th><th class="number">Ticket</th><th class="number">Margen %</th><th class="number">Cartera</th><th class="number">% 0-40</th><th>Estado</th></tr>
+                            </thead>
+                            <tbody id="comTbodyClientes"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================
+         TAB: ÁREA DE CARTERA
+         ======================================== -->
+    <div id="tab-cartera" class="tab-content">
+        <div class="fecha-corte-container">
+            <label>📅 Fecha de Corte:</label>
+            <input type="date" value="2025-01-05" id="carFechaCorte" onchange="applyCarteraFilters()">
+            <span class="fecha-corte-info">⚠️ Define el estado de cartera y días de mora</span>
+        </div>
+
+        <section class="filters-section">
+            <div class="filters-header">
+                <h3>🔍 Filtros Operativos</h3>
+                <div class="filters-header-actions">
+                    <span class="active-filters-count" id="carteraActiveFilters">0 activos</span>
+                    <button class="clear-filters-btn" onclick="clearCarteraFilters()">Limpiar todos</button>
+                </div>
+            </div>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label>Vendedor</label>
+                    <select id="carVendedor" onchange="applyCarteraFilters()"><option value="">Todos</option></select>
+                </div>
+                <div class="filter-group">
+                    <label>Cliente</label>
+                    <select id="carCliente" onchange="applyCarteraFilters()"><option value="">Todos</option></select>
+                </div>
+                <div class="filter-group">
+                    <label>Municipio</label>
+                    <select id="carMunicipio" onchange="applyCarteraFilters()"><option value="">Todos</option></select>
+                </div>
+                <div class="filter-group">
+                    <label>Tipo de Cliente</label>
+                    <select id="carTipoCliente" onchange="applyCarteraFilters()">
+                        <option value="">Todos</option>
+                        <option value="Ferretero">Ferretero</option>
+                        <option value="Aluminero">Aluminero</option>
+                        <option value="Mayorista">Mayorista</option>
+                        <option value="Industria">Industria</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Nº Factura</label>
+                    <input type="text" placeholder="Buscar..." id="carFactura" oninput="applyCarteraFilters()">
+                </div>
+                <div class="filter-group">
+                    <label>Estado</label>
+                    <select id="carEstado" onchange="applyCarteraFilters()">
+                        <option value="">Todos</option>
+                        <option value="Al día">Al día</option>
+                        <option value="Vencido">Vencido</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Días de Mora</label>
+                    <select id="carDiasMora" onchange="applyCarteraFilters()">
+                        <option value="">Todos</option>
+                        <option value="1-30">1 - 30 días</option>
+                        <option value="31-60">31 - 60 días</option>
+                        <option value="61+">+ 61 días</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Valor Mínimo</label>
+                    <input type="number" placeholder="$0" id="carValorMin" oninput="applyCarteraFilters()">
+                </div>
+                <div class="filter-group">
+                    <label>Valor Máximo</label>
+                    <input type="number" placeholder="Sin límite" id="carValorMax" oninput="applyCarteraFilters()">
+                </div>
+            </div>
+        </section>
+
+        <section class="metrics-grid" style="grid-template-columns: repeat(5, 1fr);">
+            <div class="metric-card blue">
+                <div class="metric-label">Cartera Total</div>
+                <div class="metric-value blue" id="carMetricTotal">$0</div>
+                <div class="metric-subvalue"><span id="carMetricTotalFacturas">0</span> facturas</div>
+            </div>
+            <div class="metric-card red">
+                <div class="metric-label">Cartera Vencida</div>
+                <div class="metric-value red" id="carMetricVencida">$0</div>
+                <div class="metric-subvalue"><span id="carMetricPctVencida">0%</span> del total</div>
+            </div>
+            <div class="metric-card green">
+                <div class="metric-label">Cartera Al Día</div>
+                <div class="metric-value green" id="carMetricAlDia">$0</div>
+                <div class="metric-subvalue"><span id="carMetricPctAlDia">0%</span> del total</div>
+            </div>
+            <div class="metric-card purple">
+                <div class="metric-label">Total Facturas</div>
+                <div class="metric-value purple" id="carMetricNumFacturas">0</div>
+                <div class="metric-subvalue"><span id="carMetricNumClientes">0</span> clientes</div>
+            </div>
+            <div class="metric-card orange">
+                <div class="metric-label">Facturas Vencidas</div>
+                <div class="metric-value orange" id="carMetricFacturasVencidas">0</div>
+                <div class="metric-subvalue"><span id="carMetricPctFacturasVencidas">0%</span> del total</div>
+            </div>
+        </section>
+
+        <div class="panels-grid">
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title">A) Envejecimiento de Cartera</span>
+                    <div class="panel-actions">
+                        <button class="panel-action-btn active" onclick="setCarEnvMode('monto',this)">Monto $</button>
+                        <button class="panel-action-btn" onclick="setCarEnvMode('pct',this)">% Total</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="donut-chart-wrapper">
+                        <div class="donut-chart-container"><canvas id="carChartEnvejecimiento"></canvas></div>
+                        <div class="donut-legend" id="carDonutLegend"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel">
+                <div class="panel-header"><span class="panel-title">E) Cartera por Municipio</span></div>
+                <div class="panel-body"><div class="chart-container"><canvas id="carChartMunicipio"></canvas></div></div>
+            </div>
+        </div>
+
+        <div class="panels-grid">
+            <div class="panel full-width">
+                <div class="panel-header">
+                    <span class="panel-title">B) Cartera por Vendedor</span>
+                    <div class="panel-actions"><button class="panel-action-btn" onclick="exportCSV('carVendedores')">📥 Exportar</button></div>
+                </div>
+                <div class="panel-body" style="padding:0;align-items:flex-start;">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr><th>Vendedor</th><th class="number">Cartera Total</th><th class="number">Cartera Al Día</th><th class="number">Cartera Vencida</th><th class="number">% Vencido</th><th class="number">Nº Facturas</th></tr>
+                            </thead>
+                            <tbody id="carTbodyVendedores"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panels-grid">
+            <div class="panel">
+                <div class="panel-header"><span class="panel-title">D) Top Clientes - Mayor Valor Vencido</span></div>
+                <div class="panel-body"><div class="chart-container"><canvas id="carChartTopVencido"></canvas></div></div>
+            </div>
+            <div class="panel">
+                <div class="panel-header"><span class="panel-title">F) Recaudo Acumulado por Vendedor</span></div>
+                <div class="panel-body"><div class="chart-container"><canvas id="carChartRecaudo"></canvas></div></div>
+            </div>
+        </div>
+
+        <div class="panels-grid">
+            <div class="panel full-width">
+                <div class="panel-header">
+                    <span class="panel-title">C) Clientes en Mora - Detalle de Facturas</span>
+                    <div class="panel-actions"><button class="panel-action-btn" onclick="exportCSV('carFacturas')">📥 Exportar a Excel</button></div>
+                </div>
+                <div class="panel-body" style="padding:0;align-items:flex-start;">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr><th>Cliente</th><th>Vendedor</th><th>Municipio</th><th>Tipo</th><th>Nº Factura</th><th>F. Factura</th><th>F. Venc.</th><th class="number">Días Mora</th><th class="number">Valor</th><th>Estado</th></tr>
+                            </thead>
+                            <tbody id="carTbodyFacturas"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================
+         TAB: COMISIONES / RECAUDO
+         ======================================== -->
+    <div id="tab-recaudo" class="tab-content">
+        <section class="filters-section">
+            <div class="filters-header">
+                <h3>🔍 Filtros</h3>
+                <div class="filters-header-actions">
+                    <span class="active-filters-count" id="recaudoActiveFilters">0 activos</span>
+                    <button class="clear-filters-btn" onclick="clearRecaudoFilters()">Limpiar todos</button>
+                </div>
+            </div>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label>Fecha Inicio</label>
+                    <input type="date" id="recFechaInicio" value="2025-01-01" onchange="applyRecaudoFilters()">
+                </div>
+                <div class="filter-group">
+                    <label>Fecha Fin</label>
+                    <input type="date" id="recFechaFin" value="2025-01-31" onchange="applyRecaudoFilters()">
+                </div>
+                <div class="filter-group">
+                    <label>Vendedor</label>
+                    <select id="recVendedor" onchange="applyRecaudoFilters()"><option value="">Todos</option></select>
+                </div>
+                <div class="filter-group">
+                    <label>Cliente</label>
+                    <select id="recCliente" onchange="applyRecaudoFilters()"><option value="">Todos</option></select>
+                </div>
+                <div class="filter-group">
+                    <label>Nº Factura</label>
+                    <input type="text" placeholder="Buscar..." id="recFactura" oninput="applyRecaudoFilters()">
+                </div>
+                <div class="filter-group">
+                    <label>Rango Días Pago</label>
+                    <select id="recRangoDias" onchange="applyRecaudoFilters()">
+                        <option value="">Todos</option>
+                        <option value="0-40">0 - 40 días</option>
+                        <option value="41-50">41 - 50 días</option>
+                        <option value="51+">+ 51 días (sin comisión)</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Municipio</label>
+                    <select id="recMunicipio" onchange="applyRecaudoFilters()"><option value="">Todos</option></select>
+                </div>
+                <div class="filter-group">
+                    <label>Tipo de Cliente</label>
+                    <select id="recTipoCliente" onchange="applyRecaudoFilters()">
+                        <option value="">Todos</option>
+                        <option value="Ferretero">Ferretero</option>
+                        <option value="Aluminero">Aluminero</option>
+                        <option value="Mayorista">Mayorista</option>
+                        <option value="Industria">Industria</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- TARJETAS MÉTRICAS -->
+        <section class="metrics-grid" style="grid-template-columns: repeat(6, 1fr);">
+            <div class="metric-card blue">
+                <div class="metric-label">Total Recaudado</div>
+                <div class="metric-value blue" id="recMetricTotal">$0</div>
+                <div class="metric-subvalue"><span id="recMetricNumPagos">0</span> pagos</div>
+            </div>
+            <div class="metric-card purple">
+                <div class="metric-label">Base Sin IVA</div>
+                <div class="metric-value purple" id="recMetricBaseSinIVA">$0</div>
+                <div class="metric-subvalue">Base para comisión</div>
+            </div>
+            <div class="metric-card green">
+                <div class="metric-label">% Recaudo 0-40</div>
+                <div class="metric-value green" id="recMetricPct040">0%</div>
+                <div class="metric-subvalue"><span id="recMetricMonto040">$0</span></div>
+            </div>
+            <div class="metric-card yellow">
+                <div class="metric-label">% Recaudo 41-50</div>
+                <div class="metric-value yellow" id="recMetricPct4150">0%</div>
+                <div class="metric-subvalue"><span id="recMetricMonto4150">$0</span></div>
+            </div>
+            <div class="metric-card red">
+                <div class="metric-label">Recaudo +51</div>
+                <div class="metric-value red" id="recMetricMonto51">$0</div>
+                <div class="metric-subvalue">Sin comisión</div>
+            </div>
+            <div class="metric-card cyan">
+                <div class="semaforo-indicator" id="recSemaforo"></div>
+                <div class="metric-label">Estado Comisión</div>
+                <div class="metric-value" id="recMetricEstado">-</div>
+                <div class="metric-subvalue" id="recMetricEstadoDesc">-</div>
+            </div>
+        </section>
+
+        <!-- BLOQUE DE PROGRESO -->
+        <section class="progress-block">
+            <div class="progress-block-header">
+                <div class="progress-block-title">
+                    <span>📊</span>
+                    <span>Progreso de Comisión - <span id="recVendedorSeleccionado">Todos los vendedores</span></span>
+                </div>
+                <div class="estado-comision" id="recEstadoComisionBadge">-</div>
+            </div>
+            <div class="progress-bars">
+                <div class="progress-item">
+                    <div class="progress-item-header">
+                        <span class="progress-item-label">Recaudo 0-40 días</span>
+                        <span class="progress-item-value green" id="recProgressPct040">0%</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill green" id="recProgressBar040" style="width: 0%"></div>
+                    </div>
+                    <div style="margin-top:4px;font-size:11px;color:#6b7280;" id="recProgressMonto040">$0</div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-item-header">
+                        <span class="progress-item-label">Recaudo 41-50 días</span>
+                        <span class="progress-item-value yellow" id="recProgressPct4150">0%</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill yellow" id="recProgressBar4150" style="width: 0%"></div>
+                    </div>
+                    <div style="margin-top:4px;font-size:11px;color:#6b7280;" id="recProgressMonto4150">$0</div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-item-header">
+                        <span class="progress-item-label">Recaudo +51 días</span>
+                        <span class="progress-item-value red" id="recProgressPct51">0%</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill red" id="recProgressBar51" style="width: 0%"></div>
+                    </div>
+                    <div style="margin-top:4px;font-size:11px;color:#6b7280;" id="recProgressMonto51">$0 (sin comisión)</div>
+                </div>
+            </div>
+            <div class="progress-message" id="recProgressMessage">
+                Selecciona un vendedor para ver su progreso detallado hacia la meta del 80%.
+            </div>
+        </section>
+
+        <!-- GRÁFICOS -->
+        <div class="panels-grid">
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title">Distribución de Recaudo por Rango de Días</span>
+                </div>
+                <div class="panel-body">
+                    <div class="donut-chart-wrapper">
+                        <div class="donut-chart-container"><canvas id="recChartDistribucion"></canvas></div>
+                        <div class="donut-legend" id="recDonutLegend"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel">
+                <div class="panel-header"><span class="panel-title">Recaudo por Vendedor</span></div>
+                <div class="panel-body"><div class="chart-container"><canvas id="recChartVendedor"></canvas></div></div>
+            </div>
+        </div>
+
+        <div class="panels-grid">
+            <div class="panel">
+                <div class="panel-header"><span class="panel-title">Recaudo por Tipo de Cliente</span></div>
+                <div class="panel-body"><div class="chart-container"><canvas id="recChartTipoCliente"></canvas></div></div>
+            </div>
+            <div class="panel">
+                <div class="panel-header"><span class="panel-title">Recaudo por Municipio</span></div>
+                <div class="panel-body"><div class="chart-container"><canvas id="recChartMunicipio"></canvas></div></div>
+            </div>
+        </div>
+
+        <!-- TABLA PRINCIPAL DE PAGOS -->
+        <div class="panels-grid">
+            <div class="panel full-width">
+                <div class="panel-header">
+                    <span class="panel-title">📋 Detalle de Pagos / Recaudos</span>
+                    <div class="panel-actions"><button class="panel-action-btn" onclick="exportCSV('recPagos')">📥 Exportar a Excel</button></div>
+                </div>
+                <div class="panel-body" style="padding:0;align-items:flex-start;">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Vendedor</th>
+                                    <th>Cliente</th>
+                                    <th>Nº Factura</th>
+                                    <th class="number">Valor Factura</th>
+                                    <th class="number">Valor Pago</th>
+                                    <th class="number">Base Sin IVA</th>
+                                    <th>F. Factura</th>
+                                    <th>F. Venc.</th>
+                                    <th>F. Pago</th>
+                                    <th class="number">Días Pago</th>
+                                    <th>Rango</th>
+                                    <th>Comisión</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recTbodyPagos"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESUMEN POR VENDEDOR -->
+        <div class="panels-grid">
+            <div class="panel full-width">
+                <div class="panel-header">
+                    <span class="panel-title">📊 Resumen de Comisiones por Vendedor</span>
+                    <div class="panel-actions"><button class="panel-action-btn" onclick="exportCSV('recResumen')">📥 Exportar</button></div>
+                </div>
+                <div class="panel-body" style="padding:0;align-items:flex-start;">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Vendedor</th>
+                                    <th class="number">Total Recaudado</th>
+                                    <th class="number">Base Sin IVA</th>
+                                    <th class="number">Recaudo 0-40</th>
+                                    <th class="number">% 0-40</th>
+                                    <th class="number">Recaudo 41-50</th>
+                                    <th class="number">Recaudo +51</th>
+                                    <th>Estado</th>
+                                    <th class="number">% Comisión</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recTbodyResumen"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================
+         TAB: COMPRAS
+         ======================================== -->
+    <div id="tab-compras" class="tab-content">
+        <section class="filters-section">
+            <div class="filters-header">
+                <h3>🔍 Filtros</h3>
+                <div class="filters-header-actions">
+                    <span class="active-filters-count" id="comprasActiveFilters">0 activos</span>
+                    <button class="clear-filters-btn" onclick="clearComprasFilters()">Limpiar todos</button>
+                </div>
+            </div>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label>Fecha Inicio</label>
+                    <input type="date" id="cmpFechaInicio" value="2025-01-01" onchange="applyComprasFilters()">
+                </div>
+                <div class="filter-group">
+                    <label>Fecha Fin</label>
+                    <input type="date" id="cmpFechaFin" value="2025-01-31" onchange="applyComprasFilters()">
+                </div>
+                <div class="filter-group">
+                    <label>Proveedor</label>
+                    <select id="cmpProveedor" onchange="applyComprasFilters()"><option value="">Todos</option></select>
+                </div>
+                <div class="filter-group">
+                    <label>Categoría</label>
+                    <select id="cmpCategoria" onchange="applyComprasFilters()"><option value="">Todas</option></select>
+                </div>
+                <div class="filter-group">
+                    <label>Producto</label>
+                    <select id="cmpProducto" onchange="applyComprasFilters()"><option value="">Todos</option></select>
+                </div>
+                <div class="filter-group">
+                    <label>Estado OC</label>
+                    <select id="cmpEstado" onchange="applyComprasFilters()">
+                        <option value="">Todos</option>
+                        <option value="Enviada">Enviada</option>
+                        <option value="Pendiente">Pendiente</option>
+                        <option value="Parcial">Parcial</option>
+                        <option value="Completa">Completa</option>
+                        <option value="Vencida">Vencida</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Solo Bajo Mínimo</label>
+                    <select id="cmpBajoMinimo" onchange="applyComprasFilters()">
+                        <option value="">No</option>
+                        <option value="si">Sí</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Nº Orden (OC)</label>
+                    <input type="text" placeholder="Buscar..." id="cmpNumOrden" oninput="applyComprasFilters()">
+                </div>
+            </div>
+        </section>
+
+        <!-- TARJETAS MÉTRICAS -->
+        <section class="metrics-grid" style="grid-template-columns: repeat(5, 1fr);">
+            <div class="metric-card blue">
+                <div class="metric-label">Órdenes Abiertas</div>
+                <div class="metric-value blue" id="cmpMetricAbiertas">0</div>
+                <div class="metric-subvalue">Pendientes + Parciales</div>
+            </div>
+            <div class="metric-card red">
+                <div class="metric-label">Órdenes Vencidas</div>
+                <div class="metric-value red" id="cmpMetricVencidas">0</div>
+                <div class="metric-subvalue">Fecha estimada superada</div>
+            </div>
+            <div class="metric-card orange">
+                <div class="metric-label">Productos Bajo Mínimo</div>
+                <div class="metric-value orange" id="cmpMetricBajoMinimo">0</div>
+                <div class="metric-subvalue" id="cmpMetricBajoMinimoPct">0% del catálogo</div>
+            </div>
+            <div class="metric-card yellow">
+                <div class="metric-label">Categorías Críticas</div>
+                <div class="metric-value yellow" id="cmpMetricCatCriticas">0</div>
+                <div class="metric-subvalue">>80% bajo mínimo</div>
+            </div>
+            <div class="metric-card purple">
+                <div class="metric-label">Valor OC Abiertas</div>
+                <div class="metric-value purple" id="cmpMetricValorAbiertas">$0</div>
+                <div class="metric-subvalue">Total pendiente</div>
+            </div>
+        </section>
+
+        <!-- ALERTAS -->
+        <section class="alerts-section">
+            <div class="alert-card">
+                <div class="alert-card-header">
+                    <span class="alert-card-title critical">🚨 Productos Bajo Mínimo</span>
+                    <span class="alert-card-count critical" id="cmpAlertBajoMinimoCount">0</span>
+                </div>
+                <div class="alert-card-body" id="cmpAlertBajoMinimo">
+                    <div class="alert-item"><span class="alert-item-text">Sin alertas</span></div>
+                </div>
+            </div>
+            <div class="alert-card">
+                <div class="alert-card-header">
+                    <span class="alert-card-title warning">⚠️ OC Vencidas</span>
+                    <span class="alert-card-count warning" id="cmpAlertVencidasCount">0</span>
+                </div>
+                <div class="alert-card-body" id="cmpAlertVencidas">
+                    <div class="alert-item"><span class="alert-item-text">Sin alertas</span></div>
+                </div>
+            </div>
+            <div class="alert-card">
+                <div class="alert-card-header">
+                    <span class="alert-card-title info">📋 Productos a Pedir Hoy</span>
+                    <span class="alert-card-count info" id="cmpAlertPedirHoyCount">0</span>
+                </div>
+                <div class="alert-card-body" id="cmpAlertPedirHoy">
+                    <div class="alert-item"><span class="alert-item-text">Sin alertas</span></div>
+                </div>
+            </div>
+            <div class="alert-card">
+                <div class="alert-card-header">
+                    <span class="alert-card-title warning">🏭 Proveedores con Retraso</span>
+                    <span class="alert-card-count warning" id="cmpAlertRetrasoCount">0</span>
+                </div>
+                <div class="alert-card-body" id="cmpAlertRetraso">
+                    <div class="alert-item"><span class="alert-item-text">Sin alertas</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- GRÁFICOS -->
+        <div class="panels-grid">
+            <div class="panel">
+                <div class="panel-header"><span class="panel-title">Órdenes por Estado</span></div>
+                <div class="panel-body">
+                    <div class="donut-chart-wrapper">
+                        <div class="donut-chart-container"><canvas id="cmpChartEstados"></canvas></div>
+                        <div class="donut-legend" id="cmpDonutLegend"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel">
+                <div class="panel-header"><span class="panel-title">Compras por Proveedor (Valor $)</span></div>
+                <div class="panel-body"><div class="chart-container"><canvas id="cmpChartProveedor"></canvas></div></div>
+            </div>
+        </div>
+
+        <div class="panels-grid">
+            <div class="panel">
+                <div class="panel-header"><span class="panel-title">Stock por Categoría vs Mínimo</span></div>
+                <div class="panel-body"><div class="chart-container"><canvas id="cmpChartCategoria"></canvas></div></div>
+            </div>
+            <div class="panel">
+                <div class="panel-header"><span class="panel-title">Tendencia de Compras (6 meses)</span></div>
+                <div class="panel-body"><div class="chart-container"><canvas id="cmpChartTendencia"></canvas></div></div>
+            </div>
+        </div>
+
+        <!-- TABLA INVENTARIO -->
+        <div class="panels-grid">
+            <div class="panel full-width">
+                <div class="panel-header">
+                    <span class="panel-title">📦 Estado de Inventario por Producto</span>
+                    <div class="panel-actions"><button class="panel-action-btn" onclick="exportCSV('cmpInventario')">📥 Exportar</button></div>
+                </div>
+                <div class="panel-body" style="padding:0;align-items:flex-start;">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>SKU</th>
+                                    <th>Producto</th>
+                                    <th>Categoría</th>
+                                    <th>Proveedor</th>
+                                    <th class="number">Stock Actual</th>
+                                    <th class="number">Stock Mín.</th>
+                                    <th class="number">Stock Máx.</th>
+                                    <th>Nivel</th>
+                                    <th class="number">Costo Unit.</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cmpTbodyInventario"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABLA ÓRDENES DE COMPRA -->
+        <div class="panels-grid">
+            <div class="panel full-width">
+                <div class="panel-header">
+                    <span class="panel-title">📋 Órdenes de Compra</span>
+                    <div class="panel-actions"><button class="panel-action-btn" onclick="exportCSV('cmpOrdenes')">📥 Exportar</button></div>
+                </div>
+                <div class="panel-body" style="padding:0;align-items:flex-start;">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>OC #</th>
+                                    <th>Fecha OC</th>
+                                    <th>Proveedor</th>
+                                    <th>SKU</th>
+                                    <th>Producto</th>
+                                    <th>Categoría</th>
+                                    <th class="number">Cant. Ordenada</th>
+                                    <th class="number">Cant. Recibida</th>
+                                    <th class="number">Pendiente</th>
+                                    <th class="number">Costo Unit.</th>
+                                    <th class="number">Subtotal</th>
+                                    <th>F. Estimada</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cmpTbodyOrdenes"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABLA PROVEEDORES -->
+        <div class="panels-grid">
+            <div class="panel full-width">
+                <div class="panel-header">
+                    <span class="panel-title">🏭 Rendimiento de Proveedores</span>
+                    <div class="panel-actions"><button class="panel-action-btn" onclick="exportCSV('cmpProveedores')">📥 Exportar</button></div>
+                </div>
+                <div class="panel-body" style="padding:0;align-items:flex-start;">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Proveedor</th>
+                                    <th class="number">Lead Time (días)</th>
+                                    <th class="number">OC Totales</th>
+                                    <th class="number">OC Completas</th>
+                                    <th class="number">OC Vencidas</th>
+                                    <th class="number">% Cumplimiento</th>
+                                    <th class="number">Valor Total</th>
+                                    <th class="number">Productos</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cmpTbodyProveedores"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================
+         SCRIPTS
+         ======================================== -->
+    <script>
+        // ==========================================
+        // DATOS SIMULADOS
+        // ==========================================
+        const dataComercial = {
+            ventas: [
+                { fecha: '2025-01-02', cliente: 'Ferretería El Constructor', tipoCliente: 'Ferretero', municipio: 'Barranquilla', vendedor: 'Carlos Mendoza', producto: 'Soldadura 6013 3/32 x 1kg', linea: 'Soldaduras', venta: 2850000, costo: 2137500, cantidad: 215 },
+                { fecha: '2025-01-03', cliente: 'Aluminios del Norte', tipoCliente: 'Aluminero', municipio: 'Soledad', vendedor: 'María López', producto: 'Tornillo Autorroscante 8x1', linea: 'Tornillería', venta: 1920000, costo: 1497600, cantidad: 640 },
+                { fecha: '2025-01-04', cliente: 'Mayorista Central', tipoCliente: 'Mayorista', municipio: 'Barranquilla', vendedor: 'Juan Pérez', producto: 'Silicona Transparente 280ml', linea: 'Siliconas', venta: 3200000, costo: 2464000, cantidad: 568 },
+                { fecha: '2025-01-05', cliente: 'Industrias Metalcor', tipoCliente: 'Industria', municipio: 'Malambo', vendedor: 'Ana Rodríguez', producto: 'Disco Corte 7" x 1/16', linea: 'Abrasivos', venta: 4150000, costo: 3444500, cantidad: 892 },
+                { fecha: '2025-01-06', cliente: 'Ferretería La Esquina', tipoCliente: 'Ferretero', municipio: 'Sabanalarga', vendedor: 'Pedro Gómez', producto: 'Cerradura Tipo Manija', linea: 'Cerrajería', venta: 2890000, costo: 2196400, cantidad: 124 },
+                { fecha: '2025-01-07', cliente: 'Distribuciones Caribe', tipoCliente: 'Mayorista', municipio: 'Barranquilla', vendedor: 'Carlos Mendoza', producto: 'Pegante PVC 1/4 Galón', linea: 'Pegantes', venta: 2480000, costo: 1885600, cantidad: 234 },
+                { fecha: '2025-01-08', cliente: 'Alumetal S.A.S', tipoCliente: 'Aluminero', municipio: 'Puerto Colombia', vendedor: 'María López', producto: 'Chazo Plástico 5/16', linea: 'Fijaciones', venta: 1850000, costo: 1424500, cantidad: 4520 },
+                { fecha: '2025-01-09', cliente: 'Construcciones ABC', tipoCliente: 'Industria', municipio: 'Barranquilla', vendedor: 'Juan Pérez', producto: 'Impermeabilizante 5 Galón', linea: 'Impermeabilizantes', venta: 5320000, costo: 4309200, cantidad: 89 },
+                { fecha: '2025-01-10', cliente: 'Herrajes del Caribe', tipoCliente: 'Ferretero', municipio: 'Soledad', vendedor: 'Ana Rodríguez', producto: 'Soldadura 7018 1/8 x 5kg', linea: 'Soldaduras', venta: 3980000, costo: 3104400, cantidad: 112 },
+                { fecha: '2025-01-11', cliente: 'Ferretería El Constructor', tipoCliente: 'Ferretero', municipio: 'Barranquilla', vendedor: 'Carlos Mendoza', producto: 'Malla Zaranda 1x30m', linea: 'Mallas y Plásticos', venta: 1820000, costo: 1437800, cantidad: 62 },
+                { fecha: '2025-01-12', cliente: 'Aluminios del Norte', tipoCliente: 'Aluminero', municipio: 'Soledad', vendedor: 'María López', producto: 'Tornillo Autorroscante 8x1', linea: 'Tornillería', venta: 2340000, costo: 1825200, cantidad: 780 },
+                { fecha: '2025-01-13', cliente: 'Mayorista Central', tipoCliente: 'Mayorista', municipio: 'Barranquilla', vendedor: 'Pedro Gómez', producto: 'Silicona Transparente 280ml', linea: 'Siliconas', venta: 4100000, costo: 3157000, cantidad: 728 },
+                { fecha: '2025-01-14', cliente: 'Industrias Metalcor', tipoCliente: 'Industria', municipio: 'Malambo', vendedor: 'Juan Pérez', producto: 'Soldadura 6013 3/32 x 1kg', linea: 'Soldaduras', venta: 6200000, costo: 4712000, cantidad: 468 },
+                { fecha: '2025-01-15', cliente: 'Ferretería La Esquina', tipoCliente: 'Ferretero', municipio: 'Sabanalarga', vendedor: 'Ana Rodríguez', producto: 'Cerradura Tipo Manija', linea: 'Cerrajería', venta: 3450000, costo: 2622000, cantidad: 148 },
+                { fecha: '2025-01-16', cliente: 'Distribuciones Caribe', tipoCliente: 'Mayorista', municipio: 'Barranquilla', vendedor: 'Carlos Mendoza', producto: 'Disco Corte 7" x 1/16', linea: 'Abrasivos', venta: 2890000, costo: 2398700, cantidad: 620 },
+                { fecha: '2025-01-17', cliente: 'Alumetal S.A.S', tipoCliente: 'Aluminero', municipio: 'Puerto Colombia', vendedor: 'María López', producto: 'Pegante PVC 1/4 Galón', linea: 'Pegantes', venta: 1980000, costo: 1505800, cantidad: 187 },
+                { fecha: '2025-01-18', cliente: 'Construcciones ABC', tipoCliente: 'Industria', municipio: 'Barranquilla', vendedor: 'Pedro Gómez', producto: 'Impermeabilizante 5 Galón', linea: 'Impermeabilizantes', venta: 4800000, costo: 3888000, cantidad: 80 },
+                { fecha: '2025-01-19', cliente: 'Herrajes del Caribe', tipoCliente: 'Ferretero', municipio: 'Soledad', vendedor: 'Juan Pérez', producto: 'Chazo Plástico 5/16', linea: 'Fijaciones', venta: 2100000, costo: 1617000, cantidad: 5200 },
+                { fecha: '2025-01-20', cliente: 'Ferretería El Constructor', tipoCliente: 'Ferretero', municipio: 'Barranquilla', vendedor: 'Ana Rodríguez', producto: 'Malla Zaranda 1x30m', linea: 'Mallas y Plásticos', venta: 2450000, costo: 1935500, cantidad: 84 },
+                { fecha: '2025-01-21', cliente: 'Aluminios del Norte', tipoCliente: 'Aluminero', municipio: 'Soledad', vendedor: 'Carlos Mendoza', producto: 'Soldadura 6013 3/32 x 1kg', linea: 'Soldaduras', venta: 3680000, costo: 2797600, cantidad: 278 },
+                { fecha: '2025-01-22', cliente: 'Mayorista Central', tipoCliente: 'Mayorista', municipio: 'Barranquilla', vendedor: 'María López', producto: 'Tornillo Autorroscante 8x1', linea: 'Tornillería', venta: 5200000, costo: 4056000, cantidad: 1733 },
+                { fecha: '2025-01-23', cliente: 'Industrias Metalcor', tipoCliente: 'Industria', municipio: 'Malambo', vendedor: 'Pedro Gómez', producto: 'Silicona Transparente 280ml', linea: 'Siliconas', venta: 2750000, costo: 2117500, cantidad: 489 },
+                { fecha: '2025-01-24', cliente: 'Ferretería La Esquina', tipoCliente: 'Ferretero', municipio: 'Sabanalarga', vendedor: 'Juan Pérez', producto: 'Disco Corte 7" x 1/16', linea: 'Abrasivos', venta: 1980000, costo: 1643400, cantidad: 425 },
+                { fecha: '2025-01-25', cliente: 'Distribuciones Caribe', tipoCliente: 'Mayorista', municipio: 'Barranquilla', vendedor: 'Ana Rodríguez', producto: 'Pegante PVC 1/4 Galón', linea: 'Pegantes', venta: 3200000, costo: 2432000, cantidad: 302 },
+                { fecha: '2025-01-26', cliente: 'Alumetal S.A.S', tipoCliente: 'Aluminero', municipio: 'Puerto Colombia', vendedor: 'Carlos Mendoza', producto: 'Cerradura Tipo Manija', linea: 'Cerrajería', venta: 4100000, costo: 3116000, cantidad: 176 },
+                { fecha: '2025-01-27', cliente: 'Construcciones ABC', tipoCliente: 'Industria', municipio: 'Barranquilla', vendedor: 'María López', producto: 'Soldadura 7018 1/8 x 5kg', linea: 'Soldaduras', venta: 5800000, costo: 4524000, cantidad: 164 },
+                { fecha: '2025-01-28', cliente: 'Herrajes del Caribe', tipoCliente: 'Ferretero', municipio: 'Soledad', vendedor: 'Pedro Gómez', producto: 'Chazo Plástico 5/16', linea: 'Fijaciones', venta: 1650000, costo: 1270500, cantidad: 4100 },
+                { fecha: '2025-01-29', cliente: 'Ferretería El Constructor', tipoCliente: 'Ferretero', municipio: 'Barranquilla', vendedor: 'Juan Pérez', producto: 'Impermeabilizante 5 Galón', linea: 'Impermeabilizantes', venta: 3900000, costo: 3159000, cantidad: 65 },
+                { fecha: '2025-01-30', cliente: 'Aluminios del Norte', tipoCliente: 'Aluminero', municipio: 'Soledad', vendedor: 'Ana Rodríguez', producto: 'Malla Zaranda 1x30m', linea: 'Mallas y Plásticos', venta: 2200000, costo: 1738000, cantidad: 75 },
+                { fecha: '2025-01-31', cliente: 'Mayorista Central', tipoCliente: 'Mayorista', municipio: 'Barranquilla', vendedor: 'Carlos Mendoza', producto: 'Soldadura 6013 3/32 x 1kg', linea: 'Soldaduras', venta: 4500000, costo: 3420000, cantidad: 340 },
+            ],
+            meta: 520000000,
+            tendencia: [
+                { mes: 'Ago', ventas: 398200000, margen: 82400000 },
+                { mes: 'Sep', ventas: 412500000, margen: 88200000 },
+                { mes: 'Oct', ventas: 445800000, margen: 95600000 },
+                { mes: 'Nov', ventas: 468300000, margen: 102100000 },
+                { mes: 'Dic', ventas: 520100000, margen: 112400000 },
+                { mes: 'Ene', ventas: 0, margen: 0 }
+            ],
+            cartera: {
+                'Ferretería El Constructor': { cartera: 8200000, cartera040: 7800000, estado: 'Sano' },
+                'Aluminios del Norte': { cartera: 12400000, cartera040: 9100000, estado: 'Riesgo' },
+                'Mayorista Central': { cartera: 5800000, cartera040: 5800000, estado: 'Sano' },
+                'Industrias Metalcor': { cartera: 15200000, cartera040: 6100000, estado: 'Crítico' },
+                'Ferretería La Esquina': { cartera: 4200000, cartera040: 4000000, estado: 'Sano' },
+                'Distribuciones Caribe': { cartera: 7500000, cartera040: 5200000, estado: 'Riesgo' },
+                'Alumetal S.A.S': { cartera: 3100000, cartera040: 3100000, estado: 'Sano' },
+                'Construcciones ABC': { cartera: 9800000, cartera040: 4900000, estado: 'Crítico' },
+                'Herrajes del Caribe': { cartera: 2800000, cartera040: 2800000, estado: 'Sano' }
+            }
+        };
+
+        const dataCartera = {
+            facturas: [
+                { cliente: 'Industrias Metalcor', vendedor: 'Juan Pérez', municipio: 'Malambo', tipoCliente: 'Industria', factura: 'FV-2024-1842', fechaFactura: '2024-10-15', fechaVencimiento: '2024-11-14', valor: 18400000 },
+                { cliente: 'Construcciones ABC', vendedor: 'María López', municipio: 'Barranquilla', tipoCliente: 'Industria', factura: 'FV-2024-1956', fechaFactura: '2024-10-28', fechaVencimiento: '2024-11-27', valor: 15200000 },
+                { cliente: 'Aluminios del Norte', vendedor: 'Carlos Mendoza', municipio: 'Soledad', tipoCliente: 'Aluminero', factura: 'FV-2024-2012', fechaFactura: '2024-11-05', fechaVencimiento: '2024-12-05', valor: 12400000 },
+                { cliente: 'Distribuciones Caribe', vendedor: 'Ana Rodríguez', municipio: 'Barranquilla', tipoCliente: 'Mayorista', factura: 'FV-2024-2089', fechaFactura: '2024-11-12', fechaVencimiento: '2024-12-12', valor: 9800000 },
+                { cliente: 'Ferretería El Progreso', vendedor: 'Pedro Gómez', municipio: 'Sabanalarga', tipoCliente: 'Ferretero', factura: 'FV-2024-2145', fechaFactura: '2024-11-20', fechaVencimiento: '2024-12-20', valor: 7500000 },
+                { cliente: 'Ferretería El Constructor', vendedor: 'Carlos Mendoza', municipio: 'Barranquilla', tipoCliente: 'Ferretero', factura: 'FV-2024-2234', fechaFactura: '2024-11-28', fechaVencimiento: '2024-12-28', valor: 8200000 },
+                { cliente: 'Alumetal S.A.S', vendedor: 'María López', municipio: 'Puerto Colombia', tipoCliente: 'Aluminero', factura: 'FV-2024-2298', fechaFactura: '2024-12-05', fechaVencimiento: '2025-01-04', valor: 6400000 },
+                { cliente: 'Mayorista Central', vendedor: 'Juan Pérez', municipio: 'Barranquilla', tipoCliente: 'Mayorista', factura: 'FV-2024-2356', fechaFactura: '2024-12-12', fechaVencimiento: '2025-01-11', valor: 5800000 },
+                { cliente: 'Ferretería La Esquina', vendedor: 'Ana Rodríguez', municipio: 'Sabanalarga', tipoCliente: 'Ferretero', factura: 'FV-2024-2412', fechaFactura: '2024-12-18', fechaVencimiento: '2025-01-17', valor: 4200000 },
+                { cliente: 'Herrajes del Caribe', vendedor: 'Pedro Gómez', municipio: 'Soledad', tipoCliente: 'Ferretero', factura: 'FV-2024-2489', fechaFactura: '2024-12-26', fechaVencimiento: '2025-01-25', valor: 3800000 },
+                { cliente: 'Industrias Metalcor', vendedor: 'Juan Pérez', municipio: 'Malambo', tipoCliente: 'Industria', factura: 'FV-2024-2520', fechaFactura: '2024-12-28', fechaVencimiento: '2025-01-27', valor: 11200000 },
+                { cliente: 'Construcciones ABC', vendedor: 'María López', municipio: 'Barranquilla', tipoCliente: 'Industria', factura: 'FV-2024-2545', fechaFactura: '2024-12-30', fechaVencimiento: '2025-01-29', valor: 8900000 },
+                { cliente: 'Aluminios del Norte', vendedor: 'Carlos Mendoza', municipio: 'Soledad', tipoCliente: 'Aluminero', factura: 'FV-2025-0012', fechaFactura: '2025-01-02', fechaVencimiento: '2025-02-01', valor: 7600000 },
+                { cliente: 'Ferretería El Constructor', vendedor: 'Carlos Mendoza', municipio: 'Barranquilla', tipoCliente: 'Ferretero', factura: 'FV-2025-0025', fechaFactura: '2025-01-03', fechaVencimiento: '2025-02-02', valor: 5400000 },
+            ],
+            recaudo: { 'Carlos Mendoza': 412500000, 'María López': 358200000, 'Juan Pérez': 298400000, 'Ana Rodríguez': 245800000, 'Pedro Gómez': 187600000 }
+        };
+
+        // DATOS SIMULADOS DE RECAUDO / COMISIONES
+        const dataRecaudo = {
+            pagos: [
+                { idPago: 'PAG-001', fechaPago: '2025-01-08', valorPago: 8200000, iva: 19, factura: 'FV-2024-2234', valorFactura: 8200000, fechaFactura: '2024-11-28', fechaVencimiento: '2024-12-28', cliente: 'Ferretería El Constructor', vendedor: 'Carlos Mendoza', municipio: 'Barranquilla', tipoCliente: 'Ferretero' },
+                { idPago: 'PAG-002', fechaPago: '2025-01-10', valorPago: 6400000, iva: 19, factura: 'FV-2024-2298', valorFactura: 6400000, fechaFactura: '2024-12-05', fechaVencimiento: '2025-01-04', cliente: 'Alumetal S.A.S', vendedor: 'María López', municipio: 'Puerto Colombia', tipoCliente: 'Aluminero' },
+                { idPago: 'PAG-003', fechaPago: '2025-01-12', valorPago: 5800000, iva: 19, factura: 'FV-2024-2356', valorFactura: 5800000, fechaFactura: '2024-12-12', fechaVencimiento: '2025-01-11', cliente: 'Mayorista Central', vendedor: 'Juan Pérez', municipio: 'Barranquilla', tipoCliente: 'Mayorista' },
+                { idPago: 'PAG-004', fechaPago: '2025-01-15', valorPago: 9200000, iva: 19, factura: 'FV-2024-1842', valorFactura: 18400000, fechaFactura: '2024-10-15', fechaVencimiento: '2024-11-14', cliente: 'Industrias Metalcor', vendedor: 'Juan Pérez', municipio: 'Malambo', tipoCliente: 'Industria' },
+                { idPago: 'PAG-005', fechaPago: '2025-01-18', valorPago: 4200000, iva: 19, factura: 'FV-2024-2412', valorFactura: 4200000, fechaFactura: '2024-12-18', fechaVencimiento: '2025-01-17', cliente: 'Ferretería La Esquina', vendedor: 'Ana Rodríguez', municipio: 'Sabanalarga', tipoCliente: 'Ferretero' },
+                { idPago: 'PAG-006', fechaPago: '2025-01-20', valorPago: 12400000, iva: 19, factura: 'FV-2024-2012', valorFactura: 12400000, fechaFactura: '2024-11-05', fechaVencimiento: '2024-12-05', cliente: 'Aluminios del Norte', vendedor: 'Carlos Mendoza', municipio: 'Soledad', tipoCliente: 'Aluminero' },
+                { idPago: 'PAG-007', fechaPago: '2025-01-22', valorPago: 7500000, iva: 19, factura: 'FV-2024-2145', valorFactura: 7500000, fechaFactura: '2024-11-20', fechaVencimiento: '2024-12-20', cliente: 'Ferretería El Progreso', vendedor: 'Pedro Gómez', municipio: 'Sabanalarga', tipoCliente: 'Ferretero' },
+                { idPago: 'PAG-008', fechaPago: '2025-01-23', valorPago: 9800000, iva: 19, factura: 'FV-2024-2089', valorFactura: 9800000, fechaFactura: '2024-11-12', fechaVencimiento: '2024-12-12', cliente: 'Distribuciones Caribe', vendedor: 'Ana Rodríguez', municipio: 'Barranquilla', tipoCliente: 'Mayorista' },
+                { idPago: 'PAG-009', fechaPago: '2025-01-25', valorPago: 15200000, iva: 19, factura: 'FV-2024-1956', valorFactura: 15200000, fechaFactura: '2024-10-28', fechaVencimiento: '2024-11-27', cliente: 'Construcciones ABC', vendedor: 'María López', municipio: 'Barranquilla', tipoCliente: 'Industria' },
+                { idPago: 'PAG-010', fechaPago: '2025-01-26', valorPago: 3800000, iva: 19, factura: 'FV-2024-2489', valorFactura: 3800000, fechaFactura: '2024-12-26', fechaVencimiento: '2025-01-25', cliente: 'Herrajes del Caribe', vendedor: 'Pedro Gómez', municipio: 'Soledad', tipoCliente: 'Ferretero' },
+                { idPago: 'PAG-011', fechaPago: '2025-01-27', valorPago: 9200000, iva: 19, factura: 'FV-2024-1842', valorFactura: 18400000, fechaFactura: '2024-10-15', fechaVencimiento: '2024-11-14', cliente: 'Industrias Metalcor', vendedor: 'Juan Pérez', municipio: 'Malambo', tipoCliente: 'Industria' },
+                { idPago: 'PAG-012', fechaPago: '2025-01-28', valorPago: 11200000, iva: 19, factura: 'FV-2024-2520', valorFactura: 11200000, fechaFactura: '2024-12-28', fechaVencimiento: '2025-01-27', cliente: 'Industrias Metalcor', vendedor: 'Juan Pérez', municipio: 'Malambo', tipoCliente: 'Industria' },
+                { idPago: 'PAG-013', fechaPago: '2025-01-29', valorPago: 8900000, iva: 19, factura: 'FV-2024-2545', valorFactura: 8900000, fechaFactura: '2024-12-30', fechaVencimiento: '2025-01-29', cliente: 'Construcciones ABC', vendedor: 'María López', municipio: 'Barranquilla', tipoCliente: 'Industria' },
+                { idPago: 'PAG-014', fechaPago: '2025-01-30', valorPago: 7600000, iva: 19, factura: 'FV-2025-0012', valorFactura: 7600000, fechaFactura: '2025-01-02', fechaVencimiento: '2025-02-01', cliente: 'Aluminios del Norte', vendedor: 'Carlos Mendoza', municipio: 'Soledad', tipoCliente: 'Aluminero' },
+                { idPago: 'PAG-015', fechaPago: '2025-01-31', valorPago: 5400000, iva: 19, factura: 'FV-2025-0025', valorFactura: 5400000, fechaFactura: '2025-01-03', fechaVencimiento: '2025-02-02', cliente: 'Ferretería El Constructor', vendedor: 'Carlos Mendoza', municipio: 'Barranquilla', tipoCliente: 'Ferretero' },
+            ]
+        };
+
+        // DATOS SIMULADOS DE COMPRAS
+        const dataCompras = {
+            proveedores: [
+                { id: 'PROV-001', nombre: 'West Arco', leadTime: 5, contacto: 'ventas@westarco.com', condiciones: '30 días' },
+                { id: 'PROV-002', nombre: 'SIKA', leadTime: 7, contacto: 'pedidos@sika.com', condiciones: '45 días' },
+                { id: 'PROV-003', nombre: 'Sumatec', leadTime: 3, contacto: 'compras@sumatec.com', condiciones: 'Contado' },
+                { id: 'PROV-004', nombre: 'Tornillos Atlánticos', leadTime: 4, contacto: 'ventas@tornillosatl.com', condiciones: '30 días' },
+                { id: 'PROV-005', nombre: 'Pegaucho', leadTime: 6, contacto: 'comercial@pegaucho.com', condiciones: '30 días' },
+                { id: 'PROV-006', nombre: 'Colmallas', leadTime: 8, contacto: 'ventas@colmallas.com', condiciones: '45 días' },
+                { id: 'PROV-007', nombre: 'Industria Fes', leadTime: 5, contacto: 'pedidos@industriafes.com', condiciones: '30 días' },
+                { id: 'PROV-008', nombre: 'Toolcraft', leadTime: 10, contacto: 'ventas@toolcraft.com', condiciones: '60 días' },
+            ],
+            productos: [
+                { sku: 'SOL-6013-125', nombre: 'Soldadura 6013 1/8 x 1kg', categoria: 'Soldaduras', proveedor: 'West Arco', costo: 18500, stockActual: 45, stockMin: 50, stockMax: 200 },
+                { sku: 'SOL-7018-125', nombre: 'Soldadura 7018 1/8 x 5kg', categoria: 'Soldaduras', proveedor: 'West Arco', costo: 89000, stockActual: 12, stockMin: 20, stockMax: 80 },
+                { sku: 'SOL-6011-125', nombre: 'Soldadura 6011 1/8 x 1kg', categoria: 'Soldaduras', proveedor: 'West Arco', costo: 19200, stockActual: 8, stockMin: 30, stockMax: 120 },
+                { sku: 'SIL-TRANS-280', nombre: 'Silicona Transparente 280ml', categoria: 'Siliconas', proveedor: 'SIKA', costo: 12800, stockActual: 120, stockMin: 80, stockMax: 300 },
+                { sku: 'SIL-NEGRA-280', nombre: 'Silicona Negra 280ml', categoria: 'Siliconas', proveedor: 'SIKA', costo: 13500, stockActual: 65, stockMin: 60, stockMax: 250 },
+                { sku: 'IMP-5GAL', nombre: 'Impermeabilizante 5 Galón', categoria: 'Impermeabilizantes', proveedor: 'SIKA', costo: 185000, stockActual: 18, stockMin: 25, stockMax: 100 },
+                { sku: 'TORN-AUTO-8X1', nombre: 'Tornillo Autorroscante 8x1', categoria: 'Tornillería', proveedor: 'Tornillos Atlánticos', costo: 85, stockActual: 5200, stockMin: 3000, stockMax: 15000 },
+                { sku: 'TORN-HEX-516', nombre: 'Tornillo Hexagonal 5/16', categoria: 'Tornillería', proveedor: 'Tornillos Atlánticos', costo: 120, stockActual: 1800, stockMin: 2000, stockMax: 10000 },
+                { sku: 'PEG-PVC-14', nombre: 'Pegante PVC 1/4 Galón', categoria: 'Pegantes', proveedor: 'Pegaucho', costo: 28500, stockActual: 42, stockMin: 40, stockMax: 150 },
+                { sku: 'PEG-CONT-1L', nombre: 'Pegante Contacto 1 Litro', categoria: 'Pegantes', proveedor: 'Pegaucho', costo: 35200, stockActual: 15, stockMin: 30, stockMax: 120 },
+                { sku: 'MALL-ZAR-1X30', nombre: 'Malla Zaranda 1x30m', categoria: 'Mallas y plásticos', proveedor: 'Colmallas', costo: 48000, stockActual: 22, stockMin: 20, stockMax: 80 },
+                { sku: 'MALL-GALV-1X20', nombre: 'Malla Galvanizada 1x20m', categoria: 'Mallas y plásticos', proveedor: 'Colmallas', costo: 125000, stockActual: 5, stockMin: 15, stockMax: 50 },
+                { sku: 'DISC-CORTE-7', nombre: 'Disco Corte 7" x 1/16', categoria: 'Abrasivos', proveedor: 'Industria Fes', costo: 4800, stockActual: 350, stockMin: 200, stockMax: 800 },
+                { sku: 'DISC-DESB-7', nombre: 'Disco Desbaste 7"', categoria: 'Abrasivos', proveedor: 'Industria Fes', costo: 8500, stockActual: 85, stockMin: 100, stockMax: 400 },
+                { sku: 'CHAZO-PLAST-516', nombre: 'Chazo Plástico 5/16', categoria: 'Fijaciones mecánicas', proveedor: 'Sumatec', costo: 45, stockActual: 8500, stockMin: 5000, stockMax: 20000 },
+                { sku: 'HERR-LLAV-COMB', nombre: 'Juego Llaves Combinadas', categoria: 'Industria', proveedor: 'Toolcraft', costo: 125000, stockActual: 8, stockMin: 10, stockMax: 40 },
+            ],
+            ordenes: [
+                { oc: 'OC-2025-001', fechaOC: '2025-01-05', proveedor: 'West Arco', sku: 'SOL-6013-125', producto: 'Soldadura 6013 1/8 x 1kg', categoria: 'Soldaduras', cantOrdenada: 100, costoUnit: 18500, cantRecibida: 100, estado: 'Completa', fechaEstimada: '2025-01-10' },
+                { oc: 'OC-2025-002', fechaOC: '2025-01-08', proveedor: 'SIKA', sku: 'SIL-TRANS-280', producto: 'Silicona Transparente 280ml', categoria: 'Siliconas', cantOrdenada: 150, costoUnit: 12800, cantRecibida: 150, estado: 'Completa', fechaEstimada: '2025-01-15' },
+                { oc: 'OC-2025-003', fechaOC: '2025-01-10', proveedor: 'Tornillos Atlánticos', sku: 'TORN-AUTO-8X1', producto: 'Tornillo Autorroscante 8x1', categoria: 'Tornillería', cantOrdenada: 5000, costoUnit: 85, cantRecibida: 5000, estado: 'Completa', fechaEstimada: '2025-01-14' },
+                { oc: 'OC-2025-004', fechaOC: '2025-01-12', proveedor: 'West Arco', sku: 'SOL-7018-125', producto: 'Soldadura 7018 1/8 x 5kg', categoria: 'Soldaduras', cantOrdenada: 30, costoUnit: 89000, cantRecibida: 20, estado: 'Parcial', fechaEstimada: '2025-01-17' },
+                { oc: 'OC-2025-005', fechaOC: '2025-01-15', proveedor: 'Pegaucho', sku: 'PEG-CONT-1L', producto: 'Pegante Contacto 1 Litro', categoria: 'Pegantes', cantOrdenada: 50, costoUnit: 35200, cantRecibida: 0, estado: 'Pendiente', fechaEstimada: '2025-01-21' },
+                { oc: 'OC-2025-006', fechaOC: '2025-01-18', proveedor: 'Colmallas', sku: 'MALL-GALV-1X20', producto: 'Malla Galvanizada 1x20m', categoria: 'Mallas y plásticos', cantOrdenada: 20, costoUnit: 125000, cantRecibida: 0, estado: 'Enviada', fechaEstimada: '2025-01-26' },
+                { oc: 'OC-2025-007', fechaOC: '2025-01-08', proveedor: 'Industria Fes', sku: 'DISC-DESB-7', producto: 'Disco Desbaste 7"', categoria: 'Abrasivos', cantOrdenada: 100, costoUnit: 8500, cantRecibida: 0, estado: 'Vencida', fechaEstimada: '2025-01-13' },
+                { oc: 'OC-2025-008', fechaOC: '2025-01-20', proveedor: 'SIKA', sku: 'IMP-5GAL', producto: 'Impermeabilizante 5 Galón', categoria: 'Impermeabilizantes', cantOrdenada: 40, costoUnit: 185000, cantRecibida: 0, estado: 'Pendiente', fechaEstimada: '2025-01-27' },
+                { oc: 'OC-2025-009', fechaOC: '2025-01-22', proveedor: 'Toolcraft', sku: 'HERR-LLAV-COMB', producto: 'Juego Llaves Combinadas', categoria: 'Industria', cantOrdenada: 15, costoUnit: 125000, cantRecibida: 0, estado: 'Enviada', fechaEstimada: '2025-02-01' },
+                { oc: 'OC-2025-010', fechaOC: '2025-01-05', proveedor: 'Tornillos Atlánticos', sku: 'TORN-HEX-516', producto: 'Tornillo Hexagonal 5/16', categoria: 'Tornillería', cantOrdenada: 3000, costoUnit: 120, cantRecibida: 0, estado: 'Vencida', fechaEstimada: '2025-01-09' },
+                { oc: 'OC-2025-011', fechaOC: '2025-01-25', proveedor: 'West Arco', sku: 'SOL-6011-125', producto: 'Soldadura 6011 1/8 x 1kg', categoria: 'Soldaduras', cantOrdenada: 80, costoUnit: 19200, cantRecibida: 0, estado: 'Enviada', fechaEstimada: '2025-01-30' },
+            ],
+            tendencia: [
+                { mes: 'Ago', valor: 45200000 },
+                { mes: 'Sep', valor: 52800000 },
+                { mes: 'Oct', valor: 48500000 },
+                { mes: 'Nov', valor: 61200000 },
+                { mes: 'Dic', valor: 72500000 },
+                { mes: 'Ene', valor: 0 }
+            ]
+        };
+
+        // ==========================================
+        // VARIABLES GLOBALES
+        // ==========================================
+        let comFilteredData = [];
+        let carFilteredData = [];
+        let recFilteredData = [];
+        let cmpFilteredOrdenes = [];
+        let cmpFilteredProductos = [];
+        let comCharts = {};
+        let carCharts = {};
+        let recCharts = {};
+        let cmpCharts = {};
+        let comChartModes = { tipoCliente: 'ventas', municipio: 'ventas', vendedores: 'ventas' };
+        let carEnvMode = 'monto';
+
+        const colors = { blue: '#3b82f6', green: '#22c55e', yellow: '#eab308', red: '#ef4444', purple: '#8b5cf6', orange: '#f97316', cyan: '#06b6d4', pink: '#ec4899', indigo: '#6366f1', teal: '#14b8a6' };
+        const colorArray = Object.values(colors);
+
+        // ==========================================
+        // INICIALIZACIÓN
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDateTime();
+            setInterval(updateDateTime, 60000);
+            initComercialFilters();
+            initCarteraFilters();
+            initRecaudoFilters();
+            initComprasFilters();
+            initComercialCharts();
+            initCarteraCharts();
+            initRecaudoCharts();
+            initComprasCharts();
+            applyComercialFilters();
+            applyCarteraFilters();
+            applyRecaudoFilters();
+            applyComprasFilters();
+        });
+
+        function updateDateTime() {
+            document.getElementById('currentDateTime').textContent = new Date().toLocaleString('es-CO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            
+            // Redibujar gráficos al cambiar de pestaña
+            setTimeout(() => {
+                if (tab === 'comercial') {
+                    Object.values(comCharts).forEach(c => c && c.resize && c.resize());
+                } else if (tab === 'cartera') {
+                    Object.values(carCharts).forEach(c => c && c.resize && c.resize());
+                } else if (tab === 'recaudo') {
+                    Object.values(recCharts).forEach(c => c && c.resize && c.resize());
+                } else if (tab === 'compras') {
+                    Object.values(cmpCharts).forEach(c => c && c.resize && c.resize());
+                }
+            }, 100);
+        }
+
+        // ==========================================
+        // COMERCIAL - FILTROS
+        // ==========================================
+        function initComercialFilters() {
+            const d = dataComercial.ventas;
+            populateSelect('comVendedor', [...new Set(d.map(v => v.vendedor))].sort());
+            populateSelect('comMunicipio', [...new Set(d.map(v => v.municipio))].sort());
+            populateSelect('comLinea', [...new Set(d.map(v => v.linea))].sort());
+            populateSelect('comProducto', [...new Set(d.map(v => v.producto))].sort());
+            populateSelect('comCliente', [...new Set(d.map(v => v.cliente))].sort());
+        }
+
+        function applyComercialFilters() {
+            const fi = document.getElementById('comFechaInicio').value;
+            const ff = document.getElementById('comFechaFin').value;
+            const vend = document.getElementById('comVendedor').value;
+            const mun = document.getElementById('comMunicipio').value;
+            const tipo = document.getElementById('comTipoCliente').value;
+            const lin = document.getElementById('comLinea').value;
+            const prod = document.getElementById('comProducto').value;
+            const cli = document.getElementById('comCliente').value;
+
+            comFilteredData = dataComercial.ventas.filter(v => {
+                if (fi && v.fecha < fi) return false;
+                if (ff && v.fecha > ff) return false;
+                if (vend && v.vendedor !== vend) return false;
+                if (mun && v.municipio !== mun) return false;
+                if (tipo && v.tipoCliente !== tipo) return false;
+                if (lin && v.linea !== lin) return false;
+                if (prod && v.producto !== prod) return false;
+                if (cli && v.cliente !== cli) return false;
+                return true;
+            });
+
+            const activeCount = [vend, mun, tipo, lin, prod, cli].filter(Boolean).length;
+            document.getElementById('comercialActiveFilters').textContent = activeCount + ' activos';
+            document.querySelectorAll('#tab-comercial .filter-group select').forEach(s => s.classList.toggle('active-filter', !!s.value));
+            updateComercialDashboard();
+        }
+
+        function clearComercialFilters() {
+            document.getElementById('comFechaInicio').value = '2025-01-01';
+            document.getElementById('comFechaFin').value = '2025-01-31';
+            ['comVendedor','comMunicipio','comTipoCliente','comLinea','comProducto','comCliente'].forEach(id => document.getElementById(id).value = '');
+            applyComercialFilters();
+        }
+
+        // ==========================================
+        // COMERCIAL - DASHBOARD UPDATE
+        // ==========================================
+        function updateComercialDashboard() {
+            const total = comFilteredData.reduce((s, v) => s + v.venta, 0);
+            const costo = comFilteredData.reduce((s, v) => s + v.costo, 0);
+            const margen = total - costo;
+            const margenPct = total > 0 ? (margen / total * 100) : 0;
+            const pedidos = comFilteredData.length;
+            const ticket = pedidos > 0 ? total / pedidos : 0;
+            const clientes = [...new Set(comFilteredData.map(v => v.cliente))].length;
+            const cumplimiento = (total / dataComercial.meta * 100);
+
+            document.getElementById('comMetricVentas').textContent = formatCurrency(total);
+            document.getElementById('comMetricMargen').textContent = formatCurrency(margen);
+            document.getElementById('comMetricMargenPct').textContent = margenPct.toFixed(1) + '%';
+            document.getElementById('comMetricTicket').textContent = formatCurrency(ticket);
+            document.getElementById('comMetricClientes').textContent = clientes;
+            document.getElementById('comMetricPedidos').textContent = pedidos;
+            document.getElementById('comMetricCumplimiento').textContent = cumplimiento.toFixed(1) + '%';
+            document.getElementById('comMetricClientesChange').innerHTML = `<span>+${Math.max(1, Math.floor(clientes * 0.05))} nuevos</span>`;
+            document.getElementById('comMetricPedidosChange').innerHTML = `<span>${pedidos} transacciones</span>`;
+            document.getElementById('comMetricVentasChange').innerHTML = `<span>↑ 12.4% vs anterior</span>`;
+
+            dataComercial.tendencia[5].ventas = total;
+            dataComercial.tendencia[5].margen = margen;
+
+            const sem = document.getElementById('comSemaforo');
+            const cumEl = document.getElementById('comMetricCumplimiento');
+            const statEl = document.getElementById('comMetricCumplimientoStatus');
+            sem.className = 'semaforo-indicator';
+            if (cumplimiento < 80) { sem.classList.add('rojo'); statEl.innerHTML = '<span>🔴 < 80%</span>'; cumEl.className = 'metric-value red'; }
+            else if (cumplimiento < 100) { sem.classList.add('amarillo'); statEl.innerHTML = '<span>🟡 80-99%</span>'; cumEl.className = 'metric-value yellow'; }
+            else { sem.classList.add('verde'); statEl.innerHTML = '<span>🟢 ≥ 100%</span>'; cumEl.className = 'metric-value green'; }
+
+            updateComercialCharts();
+            updateComercialTables();
+        }
+
+        // ==========================================
+        // COMERCIAL - CHARTS
+        // ==========================================
+        function initComercialCharts() {
+            Chart.defaults.color = '#6b7280';
+            Chart.defaults.font.family = "'Inter', sans-serif";
+
+            comCharts.tipoCliente = new Chart(document.getElementById('comChartTipoCliente'), {
+                type: 'bar', data: { labels: [], datasets: [{ data: [], backgroundColor: [], borderRadius: 4 }] },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: '#f0f0f0' } }, y: { grid: { display: false } } } }
+            });
+            comCharts.municipio = new Chart(document.getElementById('comChartMunicipio'), {
+                type: 'bar', data: { labels: [], datasets: [{ data: [], backgroundColor: colors.blue, borderRadius: 4 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#f0f0f0' } }, x: { grid: { display: false } } } }
+            });
+            comCharts.lineas = new Chart(document.getElementById('comChartLineas'), {
+                type: 'bar', data: { labels: [], datasets: [{ data: [], backgroundColor: [], borderRadius: 4 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#f0f0f0' } }, x: { grid: { display: false } } } }
+            });
+            comCharts.rentabilidad = new Chart(document.getElementById('comChartRentabilidad'), {
+                type: 'bar', data: { labels: [], datasets: [{ data: [], backgroundColor: [], borderRadius: 4 }] },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: '#f0f0f0' }, ticks: { callback: v => v + '%' } }, y: { grid: { display: false } } } }
+            });
+            comCharts.vendedores = new Chart(document.getElementById('comChartVendedores'), {
+                type: 'bar', data: { labels: [], datasets: [{ data: [], backgroundColor: [], borderRadius: 4 }] },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: '#f0f0f0' } }, y: { grid: { display: false } } } }
+            });
+            comCharts.tendencia = new Chart(document.getElementById('comChartTendencia'), {
+                type: 'line',
+                data: { labels: dataComercial.tendencia.map(t => t.mes), datasets: [
+                    { label: 'Ventas', data: [], borderColor: colors.blue, backgroundColor: 'rgba(59,130,246,0.1)', fill: true, tension: 0.4 },
+                    { label: 'Margen', data: [], borderColor: colors.green, backgroundColor: 'rgba(34,197,94,0.1)', fill: true, tension: 0.4 }
+                ] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', align: 'end' } }, scales: { y: { grid: { color: '#f0f0f0' }, ticks: { callback: v => '$' + v + 'M' } }, x: { grid: { display: false } } } }
+            });
+        }
+
+        function updateComercialCharts() {
+            // Tipo Cliente
+            const tipoData = groupAndAggregate(comFilteredData, 'tipoCliente', comChartModes.tipoCliente);
+            comCharts.tipoCliente.data.labels = tipoData.map(d => d.label);
+            comCharts.tipoCliente.data.datasets[0].data = tipoData.map(d => d.value);
+            comCharts.tipoCliente.data.datasets[0].backgroundColor = tipoData.map((_, i) => colorArray[i % colorArray.length]);
+            comCharts.tipoCliente.options.scales.x.ticks.callback = comChartModes.tipoCliente === 'margenPct' ? v => v.toFixed(1) + '%' : v => '$' + v.toFixed(1) + 'M';
+            comCharts.tipoCliente.update();
+
+            // Municipio
+            const munData = groupAndAggregate(comFilteredData, 'municipio', comChartModes.municipio);
+            comCharts.municipio.data.labels = munData.map(d => d.label);
+            comCharts.municipio.data.datasets[0].data = munData.map(d => d.value);
+            comCharts.municipio.options.scales.y.ticks.callback = comChartModes.municipio === 'clientes' ? v => v : v => '$' + v + 'M';
+            comCharts.municipio.update();
+
+            // Líneas
+            const linData = groupAndAggregate(comFilteredData, 'linea', 'ventas');
+            comCharts.lineas.data.labels = linData.map(d => d.label);
+            comCharts.lineas.data.datasets[0].data = linData.map(d => d.value);
+            comCharts.lineas.data.datasets[0].backgroundColor = linData.map((_, i) => colorArray[i % colorArray.length]);
+            comCharts.lineas.update();
+
+            // Rentabilidad
+            const rentData = groupAndAggregate(comFilteredData, 'linea', 'margenPct');
+            comCharts.rentabilidad.data.labels = rentData.map(d => d.label);
+            comCharts.rentabilidad.data.datasets[0].data = rentData.map(d => d.value);
+            comCharts.rentabilidad.data.datasets[0].backgroundColor = rentData.map(d => d.value >= 22 ? colors.green : d.value >= 20 ? colors.yellow : colors.orange);
+            comCharts.rentabilidad.update();
+
+            // Vendedores
+            const vendData = groupAndAggregate(comFilteredData, 'vendedor', comChartModes.vendedores);
+            comCharts.vendedores.data.labels = vendData.map(d => d.label);
+            comCharts.vendedores.data.datasets[0].data = vendData.map(d => d.value);
+            comCharts.vendedores.data.datasets[0].backgroundColor = vendData.map((d, i) => i === 0 ? colors.green : i === vendData.length - 1 ? colors.orange : colors.blue);
+            comCharts.vendedores.options.scales.x.ticks.callback = comChartModes.vendedores === 'pedidos' ? v => v : v => '$' + v.toFixed(1) + 'M';
+            comCharts.vendedores.update();
+
+            // Tendencia
+            comCharts.tendencia.data.datasets[0].data = dataComercial.tendencia.map(t => t.ventas / 1000000);
+            comCharts.tendencia.data.datasets[1].data = dataComercial.tendencia.map(t => t.margen / 1000000);
+            comCharts.tendencia.update();
+        }
+
+        function setComChartMode(chart, mode, btn) {
+            comChartModes[chart] = mode;
+            btn.parentElement.querySelectorAll('.panel-action-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            updateComercialCharts();
+        }
+
+        // ==========================================
+        // COMERCIAL - TABLES
+        // ==========================================
+        function updateComercialTables() {
+            // Productos
+            const prodGrouped = {};
+            comFilteredData.forEach(v => {
+                if (!prodGrouped[v.producto]) prodGrouped[v.producto] = { linea: v.linea, ventas: 0, costo: 0, cantidad: 0 };
+                prodGrouped[v.producto].ventas += v.venta;
+                prodGrouped[v.producto].costo += v.costo;
+                prodGrouped[v.producto].cantidad += v.cantidad;
+            });
+            const prodData = Object.entries(prodGrouped).map(([prod, d]) => ({
+                producto: prod, linea: d.linea, ventas: d.ventas, margen: d.ventas - d.costo,
+                margenPct: d.ventas > 0 ? ((d.ventas - d.costo) / d.ventas * 100) : 0, volumen: d.cantidad
+            })).sort((a, b) => b.ventas - a.ventas).slice(0, 15);
+
+            document.getElementById('comTbodyProductos').innerHTML = prodData.map((d, i) => `
+                <tr><td>${i + 1}</td><td>${d.producto}</td><td>${d.linea}</td>
+                <td class="number">${formatCurrency(d.ventas)}</td><td class="number">${formatCurrency(d.margen)}</td>
+                <td class="number ${d.margenPct >= 20 ? 'positive' : ''}">${d.margenPct.toFixed(1)}%</td>
+                <td class="number">${d.volumen.toLocaleString('es-CO')}</td></tr>
+            `).join('');
+
+            // Clientes
+            const cliGrouped = {};
+            comFilteredData.forEach(v => {
+                if (!cliGrouped[v.cliente]) cliGrouped[v.cliente] = { tipo: v.tipoCliente, municipio: v.municipio, ventas: 0, costo: 0, count: 0 };
+                cliGrouped[v.cliente].ventas += v.venta;
+                cliGrouped[v.cliente].costo += v.costo;
+                cliGrouped[v.cliente].count++;
+            });
+            const cliData = Object.entries(cliGrouped).map(([cli, d]) => {
+                const carteraInfo = dataComercial.cartera[cli] || { cartera: 0, cartera040: 0, estado: 'Sano' };
+                return {
+                    cliente: cli, tipo: d.tipo, municipio: d.municipio, ventas: d.ventas, pedidos: d.count,
+                    ticket: d.ventas / d.count, margenPct: d.ventas > 0 ? ((d.ventas - d.costo) / d.ventas * 100) : 0,
+                    cartera: carteraInfo.cartera, pct040: carteraInfo.cartera > 0 ? (carteraInfo.cartera040 / carteraInfo.cartera * 100) : 100,
+                    estado: carteraInfo.estado
+                };
+            }).sort((a, b) => b.ventas - a.ventas).slice(0, 30);
+
+            document.getElementById('comTbodyClientes').innerHTML = cliData.map(d => `
+                <tr><td>${d.cliente}</td><td>${d.tipo}</td><td>${d.municipio}</td>
+                <td class="number">${formatCurrency(d.ventas)}</td><td class="number">${d.pedidos}</td>
+                <td class="number">${formatCurrency(d.ticket)}</td>
+                <td class="number ${d.margenPct >= 20 ? 'positive' : ''}">${d.margenPct.toFixed(1)}%</td>
+                <td class="number">${formatCurrency(d.cartera)}</td>
+                <td class="number ${d.pct040 >= 80 ? 'positive' : d.pct040 < 50 ? 'negative' : ''}">${d.pct040.toFixed(0)}%</td>
+                <td><span class="status-badge ${d.estado.toLowerCase()}">${d.estado}</span></td></tr>
+            `).join('');
+        }
+
+        // ==========================================
+        // CARTERA - FILTROS
+        // ==========================================
+        function initCarteraFilters() {
+            const d = dataCartera.facturas;
+            populateSelect('carVendedor', [...new Set(d.map(f => f.vendedor))].sort());
+            populateSelect('carMunicipio', [...new Set(d.map(f => f.municipio))].sort());
+            populateSelect('carCliente', [...new Set(d.map(f => f.cliente))].sort());
+        }
+
+        function applyCarteraFilters() {
+            const fechaCorte = new Date(document.getElementById('carFechaCorte').value);
+            const vend = document.getElementById('carVendedor').value;
+            const cli = document.getElementById('carCliente').value;
+            const mun = document.getElementById('carMunicipio').value;
+            const tipo = document.getElementById('carTipoCliente').value;
+            const fac = document.getElementById('carFactura').value.toLowerCase();
+            const estado = document.getElementById('carEstado').value;
+            const diasMora = document.getElementById('carDiasMora').value;
+            const valMin = parseFloat(document.getElementById('carValorMin').value) || 0;
+            const valMax = parseFloat(document.getElementById('carValorMax').value) || Infinity;
+
+            carFilteredData = dataCartera.facturas.map(f => {
+                const fechaVenc = new Date(f.fechaVencimiento);
+                const dias = Math.floor((fechaCorte - fechaVenc) / (1000 * 60 * 60 * 24));
+                return { ...f, diasMora: dias, estado: dias > 0 ? 'Vencido' : 'Al día' };
+            }).filter(f => {
+                if (vend && f.vendedor !== vend) return false;
+                if (cli && f.cliente !== cli) return false;
+                if (mun && f.municipio !== mun) return false;
+                if (tipo && f.tipoCliente !== tipo) return false;
+                if (fac && !f.factura.toLowerCase().includes(fac)) return false;
+                if (estado && f.estado !== estado) return false;
+                if (diasMora) {
+                    if (diasMora === '1-30' && (f.diasMora < 1 || f.diasMora > 30)) return false;
+                    if (diasMora === '31-60' && (f.diasMora < 31 || f.diasMora > 60)) return false;
+                    if (diasMora === '61+' && f.diasMora < 61) return false;
+                }
+                if (f.valor < valMin || f.valor > valMax) return false;
+                return true;
+            });
+
+            let activeCount = [vend, cli, mun, tipo, fac, estado, diasMora].filter(Boolean).length;
+            if (valMin > 0) activeCount++;
+            if (valMax < Infinity && document.getElementById('carValorMax').value) activeCount++;
+            document.getElementById('carteraActiveFilters').textContent = activeCount + ' activos';
+            document.querySelectorAll('#tab-cartera .filter-group select, #tab-cartera .filter-group input').forEach(el => el.classList.toggle('active-filter', !!el.value));
+
+            updateCarteraDashboard();
+        }
+
+        function clearCarteraFilters() {
+            ['carVendedor', 'carCliente', 'carMunicipio', 'carTipoCliente', 'carEstado', 'carDiasMora'].forEach(id => document.getElementById(id).value = '');
+            ['carFactura', 'carValorMin', 'carValorMax'].forEach(id => document.getElementById(id).value = '');
+            applyCarteraFilters();
+        }
+
+        // ==========================================
+        // CARTERA - DASHBOARD UPDATE
+        // ==========================================
+        function updateCarteraDashboard() {
+            const total = carFilteredData.reduce((s, f) => s + f.valor, 0);
+            const vencidas = carFilteredData.filter(f => f.estado === 'Vencido');
+            const totalVencido = vencidas.reduce((s, f) => s + f.valor, 0);
+            const totalAlDia = total - totalVencido;
+            const numFacturas = carFilteredData.length;
+            const numVencidas = vencidas.length;
+            const numClientes = [...new Set(carFilteredData.map(f => f.cliente))].length;
+
+            document.getElementById('carMetricTotal').textContent = formatCurrency(total);
+            document.getElementById('carMetricVencida').textContent = formatCurrency(totalVencido);
+            document.getElementById('carMetricAlDia').textContent = formatCurrency(totalAlDia);
+            document.getElementById('carMetricNumFacturas').textContent = numFacturas;
+            document.getElementById('carMetricFacturasVencidas').textContent = numVencidas;
+            document.getElementById('carMetricTotalFacturas').textContent = numFacturas;
+            document.getElementById('carMetricNumClientes').textContent = numClientes;
+            document.getElementById('carMetricPctVencida').textContent = total > 0 ? (totalVencido / total * 100).toFixed(1) + '%' : '0%';
+            document.getElementById('carMetricPctAlDia').textContent = total > 0 ? (totalAlDia / total * 100).toFixed(1) + '%' : '0%';
+            document.getElementById('carMetricPctFacturasVencidas').textContent = numFacturas > 0 ? (numVencidas / numFacturas * 100).toFixed(1) + '%' : '0%';
+
+            // Badge en pestaña
+            document.getElementById('carteraVencidaBadge').textContent = numVencidas;
+
+            updateCarteraCharts();
+            updateCarteraTables();
+        }
+
+        // ==========================================
+        // CARTERA - CHARTS
+        // ==========================================
+        function initCarteraCharts() {
+            carCharts.envejecimiento = new Chart(document.getElementById('carChartEnvejecimiento'), {
+                type: 'doughnut',
+                data: { labels: [], datasets: [{ data: [], backgroundColor: [colors.green, colors.orange, colors.red], borderWidth: 0, cutout: '65%' }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+            carCharts.municipio = new Chart(document.getElementById('carChartMunicipio'), {
+                type: 'bar',
+                data: { labels: [], datasets: [
+                    { label: 'Al Día', data: [], backgroundColor: colors.green, borderRadius: 4 },
+                    { label: 'Vencida', data: [], backgroundColor: colors.red, borderRadius: 4 }
+                ] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', align: 'end' } },
+                    scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, grid: { color: '#f0f0f0' }, ticks: { callback: v => '$' + v + 'M' } } } }
+            });
+            carCharts.topVencido = new Chart(document.getElementById('carChartTopVencido'), {
+                type: 'bar', data: { labels: [], datasets: [{ data: [], backgroundColor: [], borderRadius: 4 }] },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+                    scales: { x: { grid: { color: '#f0f0f0' }, ticks: { callback: v => '$' + v + 'M' } }, y: { grid: { display: false } } } }
+            });
+            carCharts.recaudo = new Chart(document.getElementById('carChartRecaudo'), {
+                type: 'bar',
+                data: { labels: Object.keys(dataCartera.recaudo), datasets: [{ data: Object.values(dataCartera.recaudo).map(v => v / 1000000), backgroundColor: colors.blue, borderRadius: 4 }] },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+                    scales: { x: { grid: { color: '#f0f0f0' }, ticks: { callback: v => '$' + v + 'M' } }, y: { grid: { display: false } } } }
+            });
+        }
+
+        function updateCarteraCharts() {
+            const vencidas = carFilteredData.filter(f => f.estado === 'Vencido');
+            const r1_30 = vencidas.filter(f => f.diasMora >= 1 && f.diasMora <= 30).reduce((s, f) => s + f.valor, 0);
+            const r31_60 = vencidas.filter(f => f.diasMora >= 31 && f.diasMora <= 60).reduce((s, f) => s + f.valor, 0);
+            const r61 = vencidas.filter(f => f.diasMora > 60).reduce((s, f) => s + f.valor, 0);
+            const totalV = r1_30 + r31_60 + r61;
+
+            const envData = carEnvMode === 'monto' ? [r1_30 / 1e6, r31_60 / 1e6, r61 / 1e6] : [totalV > 0 ? r1_30 / totalV * 100 : 0, totalV > 0 ? r31_60 / totalV * 100 : 0, totalV > 0 ? r61 / totalV * 100 : 0];
+            carCharts.envejecimiento.data.labels = ['1-30 días', '31-60 días', '+61 días'];
+            carCharts.envejecimiento.data.datasets[0].data = envData;
+            carCharts.envejecimiento.update();
+
+            document.getElementById('carDonutLegend').innerHTML = [
+                { label: '1 - 30 días', value: r1_30, pct: totalV > 0 ? (r1_30 / totalV * 100).toFixed(1) : 0, color: colors.green },
+                { label: '31 - 60 días', value: r31_60, pct: totalV > 0 ? (r31_60 / totalV * 100).toFixed(1) : 0, color: colors.orange },
+                { label: '+ 61 días', value: r61, pct: totalV > 0 ? (r61 / totalV * 100).toFixed(1) : 0, color: colors.red }
+            ].map(d => `<div class="legend-item"><div class="legend-color" style="background:${d.color}"></div><div class="legend-text"><span class="legend-label">${d.label}</span><span class="legend-value">${formatCurrency(d.value)} (${d.pct}%)</span></div></div>`).join('');
+
+            // Municipio
+            const munG = {};
+            carFilteredData.forEach(f => {
+                if (!munG[f.municipio]) munG[f.municipio] = { alDia: 0, vencida: 0 };
+                if (f.estado === 'Al día') munG[f.municipio].alDia += f.valor; else munG[f.municipio].vencida += f.valor;
+            });
+            const munD = Object.entries(munG).sort((a, b) => (b[1].alDia + b[1].vencida) - (a[1].alDia + a[1].vencida));
+            carCharts.municipio.data.labels = munD.map(d => d[0]);
+            carCharts.municipio.data.datasets[0].data = munD.map(d => d[1].alDia / 1e6);
+            carCharts.municipio.data.datasets[1].data = munD.map(d => d[1].vencida / 1e6);
+            carCharts.municipio.update();
+
+            // Top Vencidos
+            const cliV = {};
+            vencidas.forEach(f => { cliV[f.cliente] = (cliV[f.cliente] || 0) + f.valor; });
+            const topD = Object.entries(cliV).sort((a, b) => b[1] - a[1]).slice(0, 5);
+            carCharts.topVencido.data.labels = topD.map(d => d[0]);
+            carCharts.topVencido.data.datasets[0].data = topD.map(d => d[1] / 1e6);
+            carCharts.topVencido.data.datasets[0].backgroundColor = topD.map((_, i) => i < 2 ? colors.red : i < 4 ? colors.orange : colors.yellow);
+            carCharts.topVencido.update();
+        }
+
+        function setCarEnvMode(mode, btn) {
+            carEnvMode = mode;
+            btn.parentElement.querySelectorAll('.panel-action-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            updateCarteraCharts();
+        }
+
+        // ==========================================
+        // CARTERA - TABLES
+        // ==========================================
+        function updateCarteraTables() {
+            // Vendedores
+            const vendG = {};
+            carFilteredData.forEach(f => {
+                if (!vendG[f.vendedor]) vendG[f.vendedor] = { total: 0, alDia: 0, vencida: 0, count: 0 };
+                vendG[f.vendedor].total += f.valor;
+                vendG[f.vendedor].count++;
+                if (f.estado === 'Al día') vendG[f.vendedor].alDia += f.valor; else vendG[f.vendedor].vencida += f.valor;
+            });
+            document.getElementById('carTbodyVendedores').innerHTML = Object.entries(vendG).sort((a, b) => b[1].vencida - a[1].vencida).map(([v, d]) => `
+                <tr><td>${v}</td><td class="number">${formatCurrency(d.total)}</td><td class="number positive">${formatCurrency(d.alDia)}</td>
+                <td class="number negative">${formatCurrency(d.vencida)}</td>
+                <td class="number ${d.total > 0 && d.vencida / d.total > 0.35 ? 'warning' : ''}">${d.total > 0 ? (d.vencida / d.total * 100).toFixed(1) : 0}%</td>
+                <td class="number">${d.count}</td></tr>
+            `).join('');
+
+            // Facturas
+            document.getElementById('carTbodyFacturas').innerHTML = carFilteredData.sort((a, b) => b.diasMora - a.diasMora).map(f => {
+                const moraClass = f.diasMora > 60 ? 'critical' : f.diasMora > 30 ? 'high' : f.diasMora > 15 ? 'medium' : 'low';
+                const moraWidth = Math.min(100, Math.max(0, f.diasMora / 60 * 100));
+                return `<tr class="${f.estado === 'Vencido' ? 'row-vencido' : ''}">
+                    <td>${f.cliente}</td><td>${f.vendedor}</td><td>${f.municipio}</td><td>${f.tipoCliente}</td>
+                    <td>${f.factura}</td><td>${formatDate(f.fechaFactura)}</td><td>${formatDate(f.fechaVencimiento)}</td>
+                    <td class="number"><span class="mora-bar"><span class="mora-bar-fill ${moraClass}" style="width:${moraWidth}%"></span></span>
+                    <span class="${f.diasMora > 0 ? 'negative' : 'positive'}">${f.diasMora}</span></td>
+                    <td class="number ${f.estado === 'Vencido' ? 'negative' : 'positive'}">${formatCurrency(f.valor)}</td>
+                    <td><span class="status-badge ${f.estado === 'Al día' ? 'al-dia' : 'vencido'}">${f.estado}</span></td></tr>`;
+            }).join('');
+        }
+
+        // ==========================================
+        // UTILIDADES
+        // ==========================================
+        function formatCurrency(v) {
+            if (v >= 1e6) return '$' + (v / 1e6).toFixed(1) + 'M';
+            if (v >= 1e3) return '$' + (v / 1e3).toFixed(0) + 'K';
+            return '$' + v.toFixed(0);
+        }
+        function formatDate(d) { return new Date(d).toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' }); }
+        function populateSelect(id, opts) {
+            const sel = document.getElementById(id);
+            opts.forEach(o => { const op = document.createElement('option'); op.value = o; op.textContent = o; sel.appendChild(op); });
+        }
+        function groupAndAggregate(data, key, mode) {
+            const g = {};
+            data.forEach(v => {
+                if (!g[v[key]]) g[v[key]] = { ventas: 0, costo: 0, count: 0, clientes: new Set() };
+                g[v[key]].ventas += v.venta; g[v[key]].costo += v.costo; g[v[key]].count++; g[v[key]].clientes.add(v.cliente);
+            });
+            return Object.entries(g).map(([label, d]) => {
+                let value;
+                if (mode === 'ventas') value = d.ventas / 1e6;
+                else if (mode === 'margen') value = (d.ventas - d.costo) / 1e6;
+                else if (mode === 'margenPct') value = d.ventas > 0 ? ((d.ventas - d.costo) / d.ventas * 100) : 0;
+                else if (mode === 'pedidos') value = d.count;
+                else if (mode === 'clientes') value = d.clientes.size;
+                return { label, value };
+            }).sort((a, b) => b.value - a.value);
+        }
+        function exportCSV(type) {
+            let csv = '', filename = '';
+            if (type === 'comProductos') {
+                csv = 'Producto,Línea,Ventas,Margen,Margen %,Volumen\n';
+                document.querySelectorAll('#comTbodyProductos tr').forEach(r => { csv += Array.from(r.querySelectorAll('td')).slice(1).map(c => `"${c.textContent}"`).join(',') + '\n'; });
+                filename = 'productos_ventas.csv';
+            } else if (type === 'comClientes') {
+                csv = 'Cliente,Tipo,Municipio,Ventas,Pedidos,Ticket,Margen %,Cartera,% 0-40,Estado\n';
+                document.querySelectorAll('#comTbodyClientes tr').forEach(r => { csv += Array.from(r.querySelectorAll('td')).map(c => `"${c.textContent}"`).join(',') + '\n'; });
+                filename = 'clientes_ventas.csv';
+            } else if (type === 'carVendedores') {
+                csv = 'Vendedor,Cartera Total,Cartera Al Día,Cartera Vencida,% Vencido,Nº Facturas\n';
+                document.querySelectorAll('#carTbodyVendedores tr').forEach(r => { csv += Array.from(r.querySelectorAll('td')).map(c => `"${c.textContent}"`).join(',') + '\n'; });
+                filename = 'cartera_vendedores.csv';
+            } else if (type === 'carFacturas') {
+                csv = 'Cliente,Vendedor,Municipio,Tipo,Factura,F.Factura,F.Venc,Días Mora,Valor,Estado\n';
+                document.querySelectorAll('#carTbodyFacturas tr').forEach(r => { csv += Array.from(r.querySelectorAll('td')).map(c => `"${c.textContent.trim()}"`).join(',') + '\n'; });
+                filename = 'cartera_facturas.csv';
+            } else if (type === 'recPagos') {
+                csv = 'Vendedor,Cliente,Nº Factura,Valor Factura,Valor Pago,Base Sin IVA,F.Factura,F.Venc,F.Pago,Días Pago,Rango,Comisión\n';
+                document.querySelectorAll('#recTbodyPagos tr').forEach(r => { csv += Array.from(r.querySelectorAll('td')).map(c => `"${c.textContent.trim()}"`).join(',') + '\n'; });
+                filename = 'recaudo_pagos.csv';
+            } else if (type === 'recResumen') {
+                csv = 'Vendedor,Total Recaudado,Base Sin IVA,Recaudo 0-40,% 0-40,Recaudo 41-50,Recaudo +51,Estado,% Comisión\n';
+                document.querySelectorAll('#recTbodyResumen tr').forEach(r => { csv += Array.from(r.querySelectorAll('td')).map(c => `"${c.textContent.trim()}"`).join(',') + '\n'; });
+                filename = 'recaudo_resumen_vendedores.csv';
+            } else if (type === 'cmpInventario') {
+                csv = 'SKU,Producto,Categoría,Proveedor,Stock Actual,Stock Mín,Stock Máx,Nivel,Costo Unit,Estado\n';
+                document.querySelectorAll('#cmpTbodyInventario tr').forEach(r => { csv += Array.from(r.querySelectorAll('td')).map(c => `"${c.textContent.trim()}"`).join(',') + '\n'; });
+                filename = 'inventario_productos.csv';
+            } else if (type === 'cmpOrdenes') {
+                csv = 'OC,Fecha OC,Proveedor,SKU,Producto,Categoría,Cant Ordenada,Cant Recibida,Pendiente,Costo Unit,Subtotal,F Estimada,Estado\n';
+                document.querySelectorAll('#cmpTbodyOrdenes tr').forEach(r => { csv += Array.from(r.querySelectorAll('td')).map(c => `"${c.textContent.trim()}"`).join(',') + '\n'; });
+                filename = 'ordenes_compra.csv';
+            } else if (type === 'cmpProveedores') {
+                csv = 'Proveedor,Lead Time,OC Totales,OC Completas,OC Vencidas,% Cumplimiento,Valor Total,Productos\n';
+                document.querySelectorAll('#cmpTbodyProveedores tr').forEach(r => { csv += Array.from(r.querySelectorAll('td')).map(c => `"${c.textContent.trim()}"`).join(',') + '\n'; });
+                filename = 'rendimiento_proveedores.csv';
+            }
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = filename; link.click();
+        }
+
+        // ==========================================
+        // RECAUDO - FILTROS
+        // ==========================================
+        function initRecaudoFilters() {
+            const d = dataRecaudo.pagos;
+            populateSelect('recVendedor', [...new Set(d.map(p => p.vendedor))].sort());
+            populateSelect('recCliente', [...new Set(d.map(p => p.cliente))].sort());
+            populateSelect('recMunicipio', [...new Set(d.map(p => p.municipio))].sort());
+        }
+
+        function applyRecaudoFilters() {
+            const fi = document.getElementById('recFechaInicio').value;
+            const ff = document.getElementById('recFechaFin').value;
+            const vend = document.getElementById('recVendedor').value;
+            const cli = document.getElementById('recCliente').value;
+            const fac = document.getElementById('recFactura').value.toLowerCase();
+            const rango = document.getElementById('recRangoDias').value;
+            const mun = document.getElementById('recMunicipio').value;
+            const tipo = document.getElementById('recTipoCliente').value;
+
+            // Procesar pagos y calcular campos
+            recFilteredData = dataRecaudo.pagos.map(p => {
+                const fechaPago = new Date(p.fechaPago);
+                const fechaFactura = new Date(p.fechaFactura);
+                const diasPago = Math.floor((fechaPago - fechaFactura) / (1000 * 60 * 60 * 24));
+                const baseSinIVA = p.valorPago / (1 + p.iva / 100);
+                let rangoClasif = '';
+                let aplicaComision = true;
+                if (diasPago <= 40) { rangoClasif = '0-40'; }
+                else if (diasPago <= 50) { rangoClasif = '41-50'; }
+                else { rangoClasif = '+51'; aplicaComision = false; }
+                return { ...p, diasPago, baseSinIVA, rango: rangoClasif, aplicaComision };
+            }).filter(p => {
+                if (fi && p.fechaPago < fi) return false;
+                if (ff && p.fechaPago > ff) return false;
+                if (vend && p.vendedor !== vend) return false;
+                if (cli && p.cliente !== cli) return false;
+                if (fac && !p.factura.toLowerCase().includes(fac)) return false;
+                if (mun && p.municipio !== mun) return false;
+                if (tipo && p.tipoCliente !== tipo) return false;
+                if (rango) {
+                    if (rango === '0-40' && p.rango !== '0-40') return false;
+                    if (rango === '41-50' && p.rango !== '41-50') return false;
+                    if (rango === '51+' && p.rango !== '+51') return false;
+                }
+                return true;
+            });
+
+            const activeCount = [vend, cli, fac, rango, mun, tipo].filter(Boolean).length;
+            document.getElementById('recaudoActiveFilters').textContent = activeCount + ' activos';
+            document.querySelectorAll('#tab-recaudo .filter-group select, #tab-recaudo .filter-group input[type="text"]').forEach(el => {
+                el.classList.toggle('active-filter', !!el.value);
+            });
+
+            updateRecaudoDashboard();
+        }
+
+        function clearRecaudoFilters() {
+            document.getElementById('recFechaInicio').value = '2025-01-01';
+            document.getElementById('recFechaFin').value = '2025-01-31';
+            ['recVendedor', 'recCliente', 'recMunicipio', 'recTipoCliente', 'recRangoDias'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('recFactura').value = '';
+            applyRecaudoFilters();
+        }
+
+        // ==========================================
+        // RECAUDO - DASHBOARD UPDATE
+        // ==========================================
+        function updateRecaudoDashboard() {
+            const totalRecaudado = recFilteredData.reduce((s, p) => s + p.valorPago, 0);
+            const baseSinIVA = recFilteredData.reduce((s, p) => s + p.baseSinIVA, 0);
+            const numPagos = recFilteredData.length;
+
+            const r040 = recFilteredData.filter(p => p.rango === '0-40');
+            const r4150 = recFilteredData.filter(p => p.rango === '41-50');
+            const r51 = recFilteredData.filter(p => p.rango === '+51');
+
+            const monto040 = r040.reduce((s, p) => s + p.baseSinIVA, 0);
+            const monto4150 = r4150.reduce((s, p) => s + p.baseSinIVA, 0);
+            const monto51 = r51.reduce((s, p) => s + p.baseSinIVA, 0);
+
+            const pct040 = baseSinIVA > 0 ? (monto040 / baseSinIVA * 100) : 0;
+            const pct4150 = baseSinIVA > 0 ? (monto4150 / baseSinIVA * 100) : 0;
+            const pct51 = baseSinIVA > 0 ? (monto51 / baseSinIVA * 100) : 0;
+
+            // Determinar estado de comisión
+            let estadoComision = '';
+            let pctComision = 0;
+            let estadoClass = '';
+            if (pct040 >= 80) {
+                estadoComision = 'Aplica 1,4%';
+                pctComision = 1.4;
+                estadoClass = 'aplica-14';
+            } else if (pct040 >= 60) {
+                estadoComision = 'Aplica 1,2%';
+                pctComision = 1.2;
+                estadoClass = 'aplica-12';
+            } else {
+                estadoComision = 'No aplica';
+                pctComision = 0;
+                estadoClass = 'no-aplica';
+            }
+
+            // Actualizar métricas
+            document.getElementById('recMetricTotal').textContent = formatCurrency(totalRecaudado);
+            document.getElementById('recMetricBaseSinIVA').textContent = formatCurrency(baseSinIVA);
+            document.getElementById('recMetricNumPagos').textContent = numPagos;
+            document.getElementById('recMetricPct040').textContent = pct040.toFixed(1) + '%';
+            document.getElementById('recMetricMonto040').textContent = formatCurrency(monto040);
+            document.getElementById('recMetricPct4150').textContent = pct4150.toFixed(1) + '%';
+            document.getElementById('recMetricMonto4150').textContent = formatCurrency(monto4150);
+            document.getElementById('recMetricMonto51').textContent = formatCurrency(monto51);
+
+            // Estado de comisión
+            const metricEstado = document.getElementById('recMetricEstado');
+            metricEstado.textContent = pctComision > 0 ? pctComision.toFixed(1) + '%' : '0%';
+            metricEstado.className = 'metric-value ' + (pctComision >= 1.4 ? 'green' : pctComision >= 1.2 ? 'yellow' : 'red');
+            document.getElementById('recMetricEstadoDesc').textContent = estadoComision;
+
+            const sem = document.getElementById('recSemaforo');
+            sem.className = 'semaforo-indicator ' + (pctComision >= 1.4 ? 'verde' : pctComision >= 1.2 ? 'amarillo' : 'rojo');
+
+            // Bloque de progreso
+            const vendSeleccionado = document.getElementById('recVendedor').value;
+            document.getElementById('recVendedorSeleccionado').textContent = vendSeleccionado || 'Todos los vendedores';
+
+            document.getElementById('recProgressPct040').textContent = pct040.toFixed(1) + '%';
+            document.getElementById('recProgressBar040').style.width = Math.min(100, pct040) + '%';
+            document.getElementById('recProgressMonto040').textContent = formatCurrency(monto040);
+
+            document.getElementById('recProgressPct4150').textContent = pct4150.toFixed(1) + '%';
+            document.getElementById('recProgressBar4150').style.width = Math.min(100, pct4150) + '%';
+            document.getElementById('recProgressMonto4150').textContent = formatCurrency(monto4150);
+
+            document.getElementById('recProgressPct51').textContent = pct51.toFixed(1) + '%';
+            document.getElementById('recProgressBar51').style.width = Math.min(100, pct51) + '%';
+            document.getElementById('recProgressMonto51').textContent = formatCurrency(monto51) + ' (sin comisión)';
+
+            // Mensaje de progreso
+            const badge = document.getElementById('recEstadoComisionBadge');
+            badge.textContent = estadoComision;
+            badge.className = 'estado-comision ' + estadoClass;
+
+            let mensaje = '';
+            if (pct040 >= 80) {
+                mensaje = `🎉 <strong>¡Felicitaciones!</strong> Tienes ${pct040.toFixed(1)}% del recaudo en 0-40 días. <strong>Aplicas al 1,4% de comisión.</strong>`;
+            } else if (pct040 >= 60) {
+                const falta = 80 - pct040;
+                const montoFalta = baseSinIVA * (falta / 100);
+                mensaje = `📈 Vas en <strong>${pct040.toFixed(1)}%</strong> en 0-40 días. Te falta <strong>${falta.toFixed(1)}%</strong> (${formatCurrency(montoFalta)}) para llegar al 80% y aplicar al <strong>1,4%</strong>. Actualmente aplicas al <strong>1,2%</strong>.`;
+            } else {
+                const falta80 = 80 - pct040;
+                const falta60 = 60 - pct040;
+                const montoFalta60 = baseSinIVA * (falta60 / 100);
+                mensaje = `⚠️ Vas en <strong>${pct040.toFixed(1)}%</strong> en 0-40 días. Te falta <strong>${falta60.toFixed(1)}%</strong> (${formatCurrency(montoFalta60)}) para llegar al 60% y aplicar al <strong>1,2%</strong>, o <strong>${falta80.toFixed(1)}%</strong> para el <strong>1,4%</strong>.`;
+            }
+            document.getElementById('recProgressMessage').innerHTML = mensaje;
+
+            updateRecaudoCharts();
+            updateRecaudoTables();
+        }
+
+        // ==========================================
+        // RECAUDO - CHARTS
+        // ==========================================
+        function initRecaudoCharts() {
+            recCharts.distribucion = new Chart(document.getElementById('recChartDistribucion'), {
+                type: 'doughnut',
+                data: { labels: ['0-40 días', '41-50 días', '+51 días'], datasets: [{ data: [0, 0, 0], backgroundColor: [colors.green, colors.yellow, colors.red], borderWidth: 0, cutout: '65%' }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+
+            recCharts.vendedor = new Chart(document.getElementById('recChartVendedor'), {
+                type: 'bar',
+                data: { labels: [], datasets: [
+                    { label: '0-40 días', data: [], backgroundColor: colors.green, borderRadius: 4 },
+                    { label: '41-50 días', data: [], backgroundColor: colors.yellow, borderRadius: 4 },
+                    { label: '+51 días', data: [], backgroundColor: colors.red, borderRadius: 4 }
+                ] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', align: 'end' } },
+                    scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, grid: { color: '#f0f0f0' }, ticks: { callback: v => '$' + v + 'M' } } } }
+            });
+
+            recCharts.tipoCliente = new Chart(document.getElementById('recChartTipoCliente'), {
+                type: 'bar',
+                data: { labels: [], datasets: [{ data: [], backgroundColor: colorArray, borderRadius: 4 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+                    scales: { y: { grid: { color: '#f0f0f0' }, ticks: { callback: v => '$' + v + 'M' } }, x: { grid: { display: false } } } }
+            });
+
+            recCharts.municipio = new Chart(document.getElementById('recChartMunicipio'), {
+                type: 'bar',
+                data: { labels: [], datasets: [{ data: [], backgroundColor: colors.blue, borderRadius: 4 }] },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+                    scales: { x: { grid: { color: '#f0f0f0' }, ticks: { callback: v => '$' + v + 'M' } }, y: { grid: { display: false } } } }
+            });
+        }
+
+        function updateRecaudoCharts() {
+            // Distribución por rango
+            const r040 = recFilteredData.filter(p => p.rango === '0-40').reduce((s, p) => s + p.baseSinIVA, 0);
+            const r4150 = recFilteredData.filter(p => p.rango === '41-50').reduce((s, p) => s + p.baseSinIVA, 0);
+            const r51 = recFilteredData.filter(p => p.rango === '+51').reduce((s, p) => s + p.baseSinIVA, 0);
+            const total = r040 + r4150 + r51;
+
+            recCharts.distribucion.data.datasets[0].data = [r040 / 1e6, r4150 / 1e6, r51 / 1e6];
+            recCharts.distribucion.update();
+
+            // Leyenda personalizada
+            document.getElementById('recDonutLegend').innerHTML = [
+                { label: '0-40 días', value: r040, pct: total > 0 ? (r040 / total * 100).toFixed(1) : 0, color: colors.green },
+                { label: '41-50 días', value: r4150, pct: total > 0 ? (r4150 / total * 100).toFixed(1) : 0, color: colors.yellow },
+                { label: '+51 días', value: r51, pct: total > 0 ? (r51 / total * 100).toFixed(1) : 0, color: colors.red }
+            ].map(d => `<div class="legend-item"><div class="legend-color" style="background:${d.color}"></div><div class="legend-text"><span class="legend-label">${d.label}</span><span class="legend-value">${formatCurrency(d.value)} (${d.pct}%)</span></div></div>`).join('');
+
+            // Por vendedor
+            const vendG = {};
+            recFilteredData.forEach(p => {
+                if (!vendG[p.vendedor]) vendG[p.vendedor] = { r040: 0, r4150: 0, r51: 0 };
+                if (p.rango === '0-40') vendG[p.vendedor].r040 += p.baseSinIVA;
+                else if (p.rango === '41-50') vendG[p.vendedor].r4150 += p.baseSinIVA;
+                else vendG[p.vendedor].r51 += p.baseSinIVA;
+            });
+            const vendD = Object.entries(vendG).sort((a, b) => (b[1].r040 + b[1].r4150 + b[1].r51) - (a[1].r040 + a[1].r4150 + a[1].r51));
+            recCharts.vendedor.data.labels = vendD.map(d => d[0]);
+            recCharts.vendedor.data.datasets[0].data = vendD.map(d => d[1].r040 / 1e6);
+            recCharts.vendedor.data.datasets[1].data = vendD.map(d => d[1].r4150 / 1e6);
+            recCharts.vendedor.data.datasets[2].data = vendD.map(d => d[1].r51 / 1e6);
+            recCharts.vendedor.update();
+
+            // Por tipo de cliente
+            const tipoG = {};
+            recFilteredData.forEach(p => { tipoG[p.tipoCliente] = (tipoG[p.tipoCliente] || 0) + p.baseSinIVA; });
+            const tipoD = Object.entries(tipoG).sort((a, b) => b[1] - a[1]);
+            recCharts.tipoCliente.data.labels = tipoD.map(d => d[0]);
+            recCharts.tipoCliente.data.datasets[0].data = tipoD.map(d => d[1] / 1e6);
+            recCharts.tipoCliente.update();
+
+            // Por municipio
+            const munG = {};
+            recFilteredData.forEach(p => { munG[p.municipio] = (munG[p.municipio] || 0) + p.baseSinIVA; });
+            const munD = Object.entries(munG).sort((a, b) => b[1] - a[1]);
+            recCharts.municipio.data.labels = munD.map(d => d[0]);
+            recCharts.municipio.data.datasets[0].data = munD.map(d => d[1] / 1e6);
+            recCharts.municipio.update();
+        }
+
+        // ==========================================
+        // RECAUDO - TABLES
+        // ==========================================
+        function updateRecaudoTables() {
+            // Tabla de pagos
+            document.getElementById('recTbodyPagos').innerHTML = recFilteredData.sort((a, b) => b.diasPago - a.diasPago).map(p => {
+                const diasClass = p.rango === '0-40' ? 'positive' : p.rango === '41-50' ? 'warning' : 'negative';
+                return `<tr>
+                    <td>${p.vendedor}</td>
+                    <td>${p.cliente}</td>
+                    <td>${p.factura}</td>
+                    <td class="number">${formatCurrency(p.valorFactura)}</td>
+                    <td class="number">${formatCurrency(p.valorPago)}</td>
+                    <td class="number">${formatCurrency(p.baseSinIVA)}</td>
+                    <td>${formatDate(p.fechaFactura)}</td>
+                    <td>${formatDate(p.fechaVencimiento)}</td>
+                    <td>${formatDate(p.fechaPago)}</td>
+                    <td class="number ${diasClass}">${p.diasPago}</td>
+                    <td><span class="status-badge ${p.rango === '0-40' ? 'al-dia' : p.rango === '41-50' ? 'riesgo' : 'vencido'}">${p.rango}</span></td>
+                    <td><span class="comision-badge ${p.aplicaComision ? 'si' : 'no'}">${p.aplicaComision ? 'Sí' : 'No'}</span></td>
+                </tr>`;
+            }).join('');
+
+            // Tabla resumen por vendedor
+            const vendG = {};
+            recFilteredData.forEach(p => {
+                if (!vendG[p.vendedor]) vendG[p.vendedor] = { total: 0, base: 0, r040: 0, r4150: 0, r51: 0 };
+                vendG[p.vendedor].total += p.valorPago;
+                vendG[p.vendedor].base += p.baseSinIVA;
+                if (p.rango === '0-40') vendG[p.vendedor].r040 += p.baseSinIVA;
+                else if (p.rango === '41-50') vendG[p.vendedor].r4150 += p.baseSinIVA;
+                else vendG[p.vendedor].r51 += p.baseSinIVA;
+            });
+
+            document.getElementById('recTbodyResumen').innerHTML = Object.entries(vendG).sort((a, b) => b[1].base - a[1].base).map(([v, d]) => {
+                const pct040 = d.base > 0 ? (d.r040 / d.base * 100) : 0;
+                let estado = '', pctCom = 0, estadoClass = '';
+                if (pct040 >= 80) { estado = 'Aplica 1,4%'; pctCom = 1.4; estadoClass = 'al-dia'; }
+                else if (pct040 >= 60) { estado = 'Aplica 1,2%'; pctCom = 1.2; estadoClass = 'riesgo'; }
+                else { estado = 'No aplica'; pctCom = 0; estadoClass = 'vencido'; }
+
+                return `<tr>
+                    <td>${v}</td>
+                    <td class="number">${formatCurrency(d.total)}</td>
+                    <td class="number">${formatCurrency(d.base)}</td>
+                    <td class="number positive">${formatCurrency(d.r040)}</td>
+                    <td class="number ${pct040 >= 80 ? 'positive' : pct040 >= 60 ? 'warning' : 'negative'}">${pct040.toFixed(1)}%</td>
+                    <td class="number warning">${formatCurrency(d.r4150)}</td>
+                    <td class="number negative">${formatCurrency(d.r51)}</td>
+                    <td><span class="status-badge ${estadoClass}">${estado}</span></td>
+                    <td class="number ${pctCom > 0 ? 'positive' : ''}">${pctCom.toFixed(1)}%</td>
+                </tr>`;
+            }).join('');
+        }
+
+        // ==========================================
+        // COMPRAS - FILTROS
+        // ==========================================
+        function initComprasFilters() {
+            const provs = dataCompras.proveedores.map(p => p.nombre).sort();
+            const cats = [...new Set(dataCompras.productos.map(p => p.categoria))].sort();
+            const prods = dataCompras.productos.map(p => p.nombre).sort();
+            populateSelect('cmpProveedor', provs);
+            populateSelect('cmpCategoria', cats);
+            populateSelect('cmpProducto', prods);
+        }
+
+        function applyComprasFilters() {
+            const fi = document.getElementById('cmpFechaInicio').value;
+            const ff = document.getElementById('cmpFechaFin').value;
+            const prov = document.getElementById('cmpProveedor').value;
+            const cat = document.getElementById('cmpCategoria').value;
+            const prod = document.getElementById('cmpProducto').value;
+            const estado = document.getElementById('cmpEstado').value;
+            const bajoMin = document.getElementById('cmpBajoMinimo').value;
+            const numOC = document.getElementById('cmpNumOrden').value.toLowerCase();
+
+            // Filtrar órdenes
+            cmpFilteredOrdenes = dataCompras.ordenes.filter(o => {
+                if (fi && o.fechaOC < fi) return false;
+                if (ff && o.fechaOC > ff) return false;
+                if (prov && o.proveedor !== prov) return false;
+                if (cat && o.categoria !== cat) return false;
+                if (prod && o.producto !== prod) return false;
+                if (estado && o.estado !== estado) return false;
+                if (numOC && !o.oc.toLowerCase().includes(numOC)) return false;
+                return true;
+            });
+
+            // Filtrar productos
+            cmpFilteredProductos = dataCompras.productos.filter(p => {
+                if (prov && p.proveedor !== prov) return false;
+                if (cat && p.categoria !== cat) return false;
+                if (prod && p.nombre !== prod) return false;
+                if (bajoMin === 'si' && p.stockActual >= p.stockMin) return false;
+                return true;
+            });
+
+            const activeCount = [prov, cat, prod, estado, bajoMin, numOC].filter(Boolean).length;
+            document.getElementById('comprasActiveFilters').textContent = activeCount + ' activos';
+            document.querySelectorAll('#tab-compras .filter-group select, #tab-compras .filter-group input[type="text"]').forEach(el => {
+                el.classList.toggle('active-filter', !!el.value);
+            });
+
+            updateComprasDashboard();
+        }
+
+        function clearComprasFilters() {
+            document.getElementById('cmpFechaInicio').value = '2025-01-01';
+            document.getElementById('cmpFechaFin').value = '2025-01-31';
+            ['cmpProveedor', 'cmpCategoria', 'cmpProducto', 'cmpEstado', 'cmpBajoMinimo'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('cmpNumOrden').value = '';
+            applyComprasFilters();
+        }
+
+        // ==========================================
+        // COMPRAS - DASHBOARD UPDATE
+        // ==========================================
+        function updateComprasDashboard() {
+            const hoy = new Date().toISOString().split('T')[0];
+            
+            // Métricas
+            const ordenesAbiertas = cmpFilteredOrdenes.filter(o => ['Enviada', 'Pendiente', 'Parcial'].includes(o.estado));
+            const ordenesVencidas = cmpFilteredOrdenes.filter(o => o.estado === 'Vencida' || (o.fechaEstimada < hoy && !['Completa', 'Cancelada'].includes(o.estado)));
+            const productosBajoMin = cmpFilteredProductos.filter(p => p.stockActual < p.stockMin);
+            
+            // Categorías críticas (>80% productos bajo mínimo)
+            const catStats = {};
+            dataCompras.productos.forEach(p => {
+                if (!catStats[p.categoria]) catStats[p.categoria] = { total: 0, bajoMin: 0 };
+                catStats[p.categoria].total++;
+                if (p.stockActual < p.stockMin) catStats[p.categoria].bajoMin++;
+            });
+            const catCriticas = Object.entries(catStats).filter(([_, d]) => d.total > 0 && (d.bajoMin / d.total) >= 0.8);
+
+            const valorAbiertas = ordenesAbiertas.reduce((s, o) => s + (o.cantOrdenada - o.cantRecibida) * o.costoUnit, 0);
+
+            document.getElementById('cmpMetricAbiertas').textContent = ordenesAbiertas.length;
+            document.getElementById('cmpMetricVencidas').textContent = ordenesVencidas.length;
+            document.getElementById('cmpMetricBajoMinimo').textContent = productosBajoMin.length;
+            document.getElementById('cmpMetricBajoMinimoPct').textContent = dataCompras.productos.length > 0 ? 
+                (productosBajoMin.length / dataCompras.productos.length * 100).toFixed(0) + '% del catálogo' : '0%';
+            document.getElementById('cmpMetricCatCriticas').textContent = catCriticas.length;
+            document.getElementById('cmpMetricValorAbiertas').textContent = formatCurrency(valorAbiertas);
+
+            // Badge de alertas
+            const totalAlertas = productosBajoMin.length + ordenesVencidas.length;
+            document.getElementById('comprasAlertBadge').textContent = totalAlertas;
+
+            // Actualizar alertas
+            updateComprasAlerts(productosBajoMin, ordenesVencidas, catCriticas);
+            updateComprasCharts();
+            updateComprasTables();
+        }
+
+        function updateComprasAlerts(bajoMin, vencidas, catCriticas) {
+            // Productos bajo mínimo
+            document.getElementById('cmpAlertBajoMinimoCount').textContent = bajoMin.length;
+            if (bajoMin.length > 0) {
+                document.getElementById('cmpAlertBajoMinimo').innerHTML = bajoMin.slice(0, 8).map(p => `
+                    <div class="alert-item">
+                        <span class="alert-item-text">${p.nombre}</span>
+                        <span class="alert-item-value critical">${p.stockActual}/${p.stockMin}</span>
+                    </div>
+                `).join('');
+            } else {
+                document.getElementById('cmpAlertBajoMinimo').innerHTML = '<div class="alert-item"><span class="alert-item-text">✓ Sin productos bajo mínimo</span></div>';
+            }
+
+            // OC Vencidas
+            document.getElementById('cmpAlertVencidasCount').textContent = vencidas.length;
+            if (vencidas.length > 0) {
+                document.getElementById('cmpAlertVencidas').innerHTML = vencidas.slice(0, 8).map(o => `
+                    <div class="alert-item">
+                        <span class="alert-item-text">${o.oc} - ${o.proveedor}</span>
+                        <span class="alert-item-value warning">${o.fechaEstimada}</span>
+                    </div>
+                `).join('');
+            } else {
+                document.getElementById('cmpAlertVencidas').innerHTML = '<div class="alert-item"><span class="alert-item-text">✓ Sin órdenes vencidas</span></div>';
+            }
+
+            // Productos a pedir hoy
+            const aPedir = cmpFilteredProductos.filter(p => p.stockActual <= p.stockMin);
+            document.getElementById('cmpAlertPedirHoyCount').textContent = aPedir.length;
+            if (aPedir.length > 0) {
+                document.getElementById('cmpAlertPedirHoy').innerHTML = aPedir.slice(0, 8).map(p => `
+                    <div class="alert-item">
+                        <span class="alert-item-text">${p.nombre}</span>
+                        <span class="alert-item-value">${p.proveedor}</span>
+                    </div>
+                `).join('');
+            } else {
+                document.getElementById('cmpAlertPedirHoy').innerHTML = '<div class="alert-item"><span class="alert-item-text">✓ Inventario OK</span></div>';
+            }
+
+            // Proveedores con retraso
+            const provRetraso = [...new Set(vencidas.map(o => o.proveedor))];
+            document.getElementById('cmpAlertRetrasoCount').textContent = provRetraso.length;
+            if (provRetraso.length > 0) {
+                document.getElementById('cmpAlertRetraso').innerHTML = provRetraso.slice(0, 8).map(p => {
+                    const cnt = vencidas.filter(o => o.proveedor === p).length;
+                    return `<div class="alert-item"><span class="alert-item-text">${p}</span><span class="alert-item-value warning">${cnt} OC</span></div>`;
+                }).join('');
+            } else {
+                document.getElementById('cmpAlertRetraso').innerHTML = '<div class="alert-item"><span class="alert-item-text">✓ Sin retrasos</span></div>';
+            }
+        }
+
+        // ==========================================
+        // COMPRAS - CHARTS
+        // ==========================================
+        function initComprasCharts() {
+            cmpCharts.estados = new Chart(document.getElementById('cmpChartEstados'), {
+                type: 'doughnut',
+                data: { labels: [], datasets: [{ data: [], backgroundColor: [], borderWidth: 0, cutout: '65%' }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+
+            cmpCharts.proveedor = new Chart(document.getElementById('cmpChartProveedor'), {
+                type: 'bar',
+                data: { labels: [], datasets: [{ data: [], backgroundColor: colors.blue, borderRadius: 4 }] },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+                    scales: { x: { grid: { color: '#f0f0f0' }, ticks: { callback: v => '$' + v + 'M' } }, y: { grid: { display: false } } } }
+            });
+
+            cmpCharts.categoria = new Chart(document.getElementById('cmpChartCategoria'), {
+                type: 'bar',
+                data: { labels: [], datasets: [
+                    { label: 'Stock Actual', data: [], backgroundColor: colors.blue, borderRadius: 4 },
+                    { label: 'Stock Mínimo', data: [], backgroundColor: colors.orange, borderRadius: 4 }
+                ] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', align: 'end' } },
+                    scales: { x: { grid: { display: false } }, y: { grid: { color: '#f0f0f0' } } } }
+            });
+
+            cmpCharts.tendencia = new Chart(document.getElementById('cmpChartTendencia'), {
+                type: 'line',
+                data: { labels: dataCompras.tendencia.map(t => t.mes), datasets: [
+                    { label: 'Compras', data: dataCompras.tendencia.map(t => t.valor / 1e6), borderColor: colors.purple, backgroundColor: 'rgba(139,92,246,0.1)', fill: true, tension: 0.4 }
+                ] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+                    scales: { y: { grid: { color: '#f0f0f0' }, ticks: { callback: v => '$' + v + 'M' } }, x: { grid: { display: false } } } }
+            });
+        }
+
+        function updateComprasCharts() {
+            // Estados de OC
+            const estadosCount = {};
+            cmpFilteredOrdenes.forEach(o => { estadosCount[o.estado] = (estadosCount[o.estado] || 0) + 1; });
+            const estadosColors = { 'Completa': colors.green, 'Enviada': colors.blue, 'Pendiente': colors.orange, 'Parcial': colors.yellow, 'Vencida': colors.red, 'Cancelada': '#9ca3af' };
+            const estadosData = Object.entries(estadosCount).sort((a, b) => b[1] - a[1]);
+            
+            cmpCharts.estados.data.labels = estadosData.map(d => d[0]);
+            cmpCharts.estados.data.datasets[0].data = estadosData.map(d => d[1]);
+            cmpCharts.estados.data.datasets[0].backgroundColor = estadosData.map(d => estadosColors[d[0]] || colors.blue);
+            cmpCharts.estados.update();
+
+            // Leyenda personalizada
+            const total = estadosData.reduce((s, d) => s + d[1], 0);
+            document.getElementById('cmpDonutLegend').innerHTML = estadosData.map(([label, value]) => `
+                <div class="legend-item">
+                    <div class="legend-color" style="background:${estadosColors[label] || colors.blue}"></div>
+                    <div class="legend-text">
+                        <span class="legend-label">${label}</span>
+                        <span class="legend-value">${value} (${total > 0 ? (value / total * 100).toFixed(0) : 0}%)</span>
+                    </div>
+                </div>
+            `).join('');
+
+            // Por proveedor
+            const provG = {};
+            cmpFilteredOrdenes.forEach(o => { provG[o.proveedor] = (provG[o.proveedor] || 0) + o.cantOrdenada * o.costoUnit; });
+            const provD = Object.entries(provG).sort((a, b) => b[1] - a[1]).slice(0, 8);
+            cmpCharts.proveedor.data.labels = provD.map(d => d[0]);
+            cmpCharts.proveedor.data.datasets[0].data = provD.map(d => d[1] / 1e6);
+            cmpCharts.proveedor.update();
+
+            // Por categoría
+            const catG = {};
+            cmpFilteredProductos.forEach(p => {
+                if (!catG[p.categoria]) catG[p.categoria] = { actual: 0, min: 0 };
+                catG[p.categoria].actual += p.stockActual;
+                catG[p.categoria].min += p.stockMin;
+            });
+            const catD = Object.entries(catG).sort((a, b) => (b[1].actual - b[1].min) - (a[1].actual - a[1].min));
+            cmpCharts.categoria.data.labels = catD.map(d => d[0]);
+            cmpCharts.categoria.data.datasets[0].data = catD.map(d => d[1].actual);
+            cmpCharts.categoria.data.datasets[1].data = catD.map(d => d[1].min);
+            cmpCharts.categoria.update();
+
+            // Tendencia - actualizar mes actual
+            const valorMesActual = cmpFilteredOrdenes.reduce((s, o) => s + o.cantOrdenada * o.costoUnit, 0);
+            dataCompras.tendencia[5].valor = valorMesActual;
+            cmpCharts.tendencia.data.datasets[0].data = dataCompras.tendencia.map(t => t.valor / 1e6);
+            cmpCharts.tendencia.update();
+        }
+
+        // ==========================================
+        // COMPRAS - TABLES
+        // ==========================================
+        function updateComprasTables() {
+            // Inventario
+            document.getElementById('cmpTbodyInventario').innerHTML = cmpFilteredProductos
+                .sort((a, b) => (a.stockActual / a.stockMin) - (b.stockActual / b.stockMin))
+                .map(p => {
+                    const nivel = p.stockActual / p.stockMax * 100;
+                    const nivelClass = p.stockActual < p.stockMin ? 'critical' : p.stockActual < p.stockMin * 1.5 ? 'warning' : 'ok';
+                    const estado = p.stockActual < p.stockMin ? 'Bajo Mínimo' : p.stockActual <= p.stockMin * 1.2 ? 'En Mínimo' : 'OK';
+                    const estadoClass = p.stockActual < p.stockMin ? 'vencido' : p.stockActual <= p.stockMin * 1.2 ? 'riesgo' : 'al-dia';
+                    return `<tr>
+                        <td>${p.sku}</td>
+                        <td>${p.nombre}</td>
+                        <td>${p.categoria}</td>
+                        <td>${p.proveedor}</td>
+                        <td class="number ${p.stockActual < p.stockMin ? 'negative' : ''}">${p.stockActual.toLocaleString('es-CO')}</td>
+                        <td class="number">${p.stockMin.toLocaleString('es-CO')}</td>
+                        <td class="number">${p.stockMax.toLocaleString('es-CO')}</td>
+                        <td><div class="stock-indicator"><span class="stock-bar"><span class="stock-bar-fill ${nivelClass}" style="width:${Math.min(100, nivel)}%"></span></span><span>${nivel.toFixed(0)}%</span></div></td>
+                        <td class="number">${formatCurrency(p.costo)}</td>
+                        <td><span class="status-badge ${estadoClass}">${estado}</span></td>
+                    </tr>`;
+                }).join('');
+
+            // Órdenes
+            document.getElementById('cmpTbodyOrdenes').innerHTML = cmpFilteredOrdenes
+                .sort((a, b) => new Date(b.fechaOC) - new Date(a.fechaOC))
+                .map(o => {
+                    const pendiente = o.cantOrdenada - o.cantRecibida;
+                    const subtotal = o.cantOrdenada * o.costoUnit;
+                    const estadoClass = o.estado.toLowerCase().replace(' ', '-');
+                    return `<tr>
+                        <td>${o.oc}</td>
+                        <td>${formatDate(o.fechaOC)}</td>
+                        <td>${o.proveedor}</td>
+                        <td>${o.sku}</td>
+                        <td>${o.producto}</td>
+                        <td>${o.categoria}</td>
+                        <td class="number">${o.cantOrdenada.toLocaleString('es-CO')}</td>
+                        <td class="number ${o.cantRecibida > 0 ? 'positive' : ''}">${o.cantRecibida.toLocaleString('es-CO')}</td>
+                        <td class="number ${pendiente > 0 ? 'warning' : ''}">${pendiente.toLocaleString('es-CO')}</td>
+                        <td class="number">${formatCurrency(o.costoUnit)}</td>
+                        <td class="number">${formatCurrency(subtotal)}</td>
+                        <td>${formatDate(o.fechaEstimada)}</td>
+                        <td><span class="oc-status ${estadoClass}">${o.estado}</span></td>
+                    </tr>`;
+                }).join('');
+
+            // Proveedores
+            const provStats = {};
+            dataCompras.ordenes.forEach(o => {
+                if (!provStats[o.proveedor]) {
+                    const provInfo = dataCompras.proveedores.find(p => p.nombre === o.proveedor);
+                    provStats[o.proveedor] = { leadTime: provInfo?.leadTime || 0, total: 0, completas: 0, vencidas: 0, valor: 0, productos: new Set() };
+                }
+                provStats[o.proveedor].total++;
+                if (o.estado === 'Completa') provStats[o.proveedor].completas++;
+                if (o.estado === 'Vencida') provStats[o.proveedor].vencidas++;
+                provStats[o.proveedor].valor += o.cantOrdenada * o.costoUnit;
+                provStats[o.proveedor].productos.add(o.sku);
+            });
+
+            document.getElementById('cmpTbodyProveedores').innerHTML = Object.entries(provStats)
+                .sort((a, b) => b[1].valor - a[1].valor)
+                .map(([prov, d]) => {
+                    const cumplimiento = d.total > 0 ? (d.completas / d.total * 100) : 0;
+                    return `<tr>
+                        <td>${prov}</td>
+                        <td class="number">${d.leadTime}</td>
+                        <td class="number">${d.total}</td>
+                        <td class="number positive">${d.completas}</td>
+                        <td class="number ${d.vencidas > 0 ? 'negative' : ''}">${d.vencidas}</td>
+                        <td class="number ${cumplimiento >= 80 ? 'positive' : cumplimiento >= 50 ? 'warning' : 'negative'}">${cumplimiento.toFixed(0)}%</td>
+                        <td class="number">${formatCurrency(d.valor)}</td>
+                        <td class="number">${d.productos.size}</td>
+                    </tr>`;
+                }).join('');
+        }
+    </script>
+</body>
+</html>

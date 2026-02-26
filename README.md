@@ -1,2 +1,0 @@
-# Dashboard
-Dashboard para metricas
